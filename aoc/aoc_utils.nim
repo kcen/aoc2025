@@ -31,20 +31,25 @@ from utils/grid import
   linearIndex, coordFromIndex, gridToLinear, linearToGrid,
   gridPositions, gridItems, mutableGridItems
 
-# Mathematical utilities
+# Mathematical utilities (no factorial functions - they are in combinatorics)
 from utils/math import
   gcd, lcm, gcdSeq, lcmSeq, gcdBinary,
   powMod, modInverse, modAdd, modSub, modMul, modPowFast, chineseRemainder,
   MOD,
   isPrimeFast, smallestPrimeFactor, primeFactorization,
   fibonacciFast, tribonacciFast,
-  digitSum, digitProduct, digitCount, reverseNumber, isPalindromeNumber,
-  initFactorials, nCrFast, nPrFast
+  digitSum, digitProduct, digitCount, reverseNumber, isPalindromeNumber
 
-# Combinatorics utilities
+# Combinatorics utilities (includes all factorial and combination functions)
 from utils/combinatorics import
   combinations, permutations, product,
-  countCombinations, countPermutations, combinationsMemoized
+  countCombinations, countPermutations, combinationsMemoized,
+  initFastFactorials, ensureFactorials, ensureInvFactorials, nCrFast, nPrFast
+
+# Memoization utilities (template-based caching for recursive functions)
+from utils/memoization import
+  memoizeRec, memoize2Args, memoize3Args, memoizeCombinatorics,
+  memoizeString, memoizeFibonacci, memoizeFactorial
 
 # Bit manipulation utilities
 from utils/bitops import
@@ -98,18 +103,22 @@ export
   linearIndex, coordFromIndex, gridToLinear, linearToGrid,
   gridPositions, gridItems, mutableGridItems,
 
-  # Math
+  # Math (factorial functions are in combinatorics)
   gcd, lcm, gcdSeq, lcmSeq, gcdBinary,
   powMod, modInverse, modAdd, modSub, modMul, modPowFast, chineseRemainder,
   MOD,
   isPrimeFast, smallestPrimeFactor, primeFactorization,
   fibonacciFast, tribonacciFast,
   digitSum, digitProduct, digitCount, reverseNumber, isPalindromeNumber,
-  initFactorials, nCrFast, nPrFast,
 
-  # Combinatorics
+  # Combinatorics (includes all factorial and combination functions)
   combinations, permutations, product,
   countCombinations, countPermutations, combinationsMemoized,
+  initFastFactorials, ensureFactorials, ensureInvFactorials, nCrFast, nPrFast,
+
+  # Memoization (template-based caching)
+  memoizeRec, memoize2Args, memoize3Args, memoizeCombinatorics,
+  memoizeString, memoizeFibonacci, memoizeFactorial,
 
   # Bit operations
   DIGIT_SUM_LUT, POPCOUNT_LUT, CHAR_CLASS_LUT,
@@ -144,7 +153,8 @@ export
 # - String parsing and extraction functions
 # - 2D/3D coordinate and grid operations
 # - Mathematical utilities (GCD, LCM, modular arithmetic, etc.)
-# - Combinatorics (combinations, permutations)
+# - Combinatorics (combinations, permutations) - INCLUDES FACTORIALS
+# - Memoization templates - Transform exponential algorithms to linear
 # - Bit manipulation and performance optimizations
 # - SIMD-friendly and branch-free operations
 #
@@ -161,6 +171,16 @@ export
 #
 # let result = sumH(numbers)
 # echo printSolution(Solution(part_one: $result, part_two: "42"))
+# ```
+#
+# For memoization examples:
+# ```
+# # Transform exponential Fibonacci to linear
+# memoizeRec(fib):
+#   if n <= 1: n
+#   else: fib(n - 1) + fib(n - 2)
+#
+# let fib40 = fib(40)  # Now fast!
 # ```
 #
 # For best performance, compile with:

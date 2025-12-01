@@ -42,9 +42,9 @@ new DAY:
   @echo "Created aoc/day_{{DAY}}.nim and input files"
   @echo "Remember to add day_{{DAY}} to aoc.nim imports and case statement!"
 
-# Test the example (day 0)
+# Test the utils
 test:
-  @just run 0 inputs/hello_world
+  nimble test
 
 # Clean build artifacts
 clean:
@@ -54,6 +54,7 @@ clean:
 # Format Nim code
 fmt:
   @find aoc -name "*.nim" -exec nimpretty {} \;
+  @find tests -name "*.nim" -exec nimpretty {} \;
   @nimpretty aoc.nim
 
 # Build Docker containers

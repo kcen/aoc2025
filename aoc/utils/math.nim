@@ -256,38 +256,3 @@ proc reverseNumber*(n: int): int =
 
 proc isPalindromeNumber*(n: int): bool =
   n == reverseNumber(n)
-
-# ============================================================================
-# FACTORIALS AND COMBINATORIAL PRECOMPUTATION
-# ============================================================================
-
-var factorialCache*: seq[int]
-var invFactorialCache*: seq[int]
-
-proc initFactorials*(maxN: int, modulus: int = MOD) =
-  ## Precompute factorials and inverse factorials for fast nCr lookup
-  factorialCache = newSeq[int](maxN + 1)
-  invFactorialCache = newSeq[int](maxN + 1)
-
-  factorialCache[0] = 1
-  for i in 1..maxN:
-    factorialCache[i] = (factorialCache[i-1] * i) mod modulus
-
-  invFactorialCache[maxN] = modInverse(factorialCache[maxN], modulus)
-  for i in countdown(maxN - 1, 0):
-    invFactorialCache[i] = (invFactorialCache[i + 1] * (i + 1)) mod modulus
-
-proc nCrFast*(n, r: int, modulus: int = MOD): int =
-  ## Fast combination lookup (requires initFactorials)
-  if r > n or r < 0:
-    return 0
-  if r == 0 or r == n:
-    return 1
-  (factorialCache[n] * invFactorialCache[r] mod modulus * invFactorialCache[n -
-      r]) mod modulus
-
-proc nPrFast*(n, r: int, modulus: int = MOD): int =
-  ## Fast permutation lookup
-  if r > n or r < 0:
-    return 0
-  (factorialCache[n] * invFactorialCache[n - r]) mod modulus

@@ -7,7 +7,7 @@ import ../aoc/aoc_utils
 suite "Core Input/Output":
   test "getDay: returns valid day number":
     let day = getDay()
-    check day == -1  # Default when not set
+    check day == -1 # Default when not set
 
   test "Solution creation":
     let sol = Solution(part_one: "test1", part_two: "test2")
@@ -29,12 +29,12 @@ suite "Aggregation Helpers":
   test "sumWhere: sum matching elements":
     let arr = @[1, 2, 3, 4, 5]
     let total = sumWhere(arr, proc(x: int): bool = x > 2)
-    check total == 12  # 3 + 4 + 5
+    check total == 12 # 3 + 4 + 5
 
   test "productWhere: product of matching":
     let arr = @[1, 2, 3, 4, 5]
     let prod = productWhere(arr, proc(x: int): bool = x < 3)
-    check prod == 2  # 1 * 2
+    check prod == 2 # 1 * 2
 
 suite "Grouping and Counting":
   test "groupBy: group items by key":

@@ -9,26 +9,26 @@ suite "String Parsing":
     let input = "  hello\n  world  \n  test  "
     let result = parseLines(input)
     check result == @["hello", "world", "test"]
-  
+
   test "parseLines: handles empty lines":
     let input = "line1\n\nline2\n"
     let result = parseLines(input)
     check result.len == 2
     check result[0] == "line1"
     check result[1] == "line2"
-  
+
   test "parseInts: extracts all integers from string":
     let result = parseInts("10 20 30 40")
     check result == @[10, 20, 30, 40]
-  
+
   test "parseInts: handles negative numbers":
     let result = parseInts("1 -5 3 -10")
     check result == @[1, -5, 3, -10]
-  
+
   test "parseInts: works with different separators":
     let result = parseInts("10,20,30", ',')
     check result == @[10, 20, 30]
-  
+
   test "parseChars: converts string to char sequence":
     let result = parseChars("ABC")
     check result == @['A', 'B', 'C']

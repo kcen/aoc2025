@@ -98,3 +98,62 @@ proc matchPattern*[T](pattern: seq[T], text: seq[T]): seq[int] =
       matches.add(i)
 
   matches
+
+# ============================================================================
+# MEMOIZATION SUPPORT FOR RECURSIVE FUNCTIONS
+# ============================================================================
+
+import std/tables
+
+# Template for creating memoized versions of functions
+template memoize*(fnName: untyped, argType: typedesc,
+    resultType: typedesc): untyped =
+  var cache: Table[argType, resultType] = initTable[argType, resultType]()
+
+  template fnName*(n: argType): resultType =
+    if n in cache:
+      cache[n]
+    else:
+      let result = fnName(n) # Note: This needs to be defined separately
+      cache[n] = result
+      result
+
+# Specific memoization templates for common patterns
+template memoizeRec*(fnName: untyped, `fn`: untyped): untyped =
+  ## Memoize a recursive function with automatic caching
+  var cache: Table[int, int] = initTable[int, int]()
+
+  template `fnName`*(n: int): int =
+    if n in cache:
+      cache[n]
+    else:
+      let result = `fn`
+      cache[n] = result
+      result
+
+# Example usage for fibonacci:
+template memoizeFib*: untyped =
+  var cache: Table[int, int] = initTable[int, int]()
+  cache[0] = 0
+  cache[1] = 1
+
+  template fibonacciMemoized*(n: int): int =
+    if n in cache:
+      cache[n]
+    else:
+      let result = fibonacciMemoized(n-1) + fibonacciMemoized(n-2)
+      cache[n] = result
+      result
+
+# More flexible memoization for multi-argument functions
+template memoize2*(fnName: untyped, `fn`: untyped): untyped =
+  var cache: Table[(int, int), int] = initTable[(int, int), int]()
+
+  template fnName*(a, b: int): int =
+    let key = (a, b)
+    if key in cache:
+      cache[key]
+    else:
+      let result = `fn`
+      cache[key] = result
+      result

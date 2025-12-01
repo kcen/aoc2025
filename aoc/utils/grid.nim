@@ -26,22 +26,25 @@ const
     (0, -1, 0), (0, 0, 1), (0, 0, -1)]  # Y-, Z+, Z-
 
 # ============================================================================
-# COORDINATE OPERATIONS
+# COORDINATE OPERATIONS (OPTIMIZED WITH INLINE)
 # ============================================================================
 
-proc `+`*(a: Coord, b: Coord): Coord = (a.r + b.r, a.c + b.c)
-proc `-`*(a: Coord, b: Coord): Coord = (a.r - b.r, a.c - b.c)
-proc `*`*(a: Coord, s: int): Coord = (a.r * s, a.c * s)
+proc `+`*(a: Coord, b: Coord): Coord {.inline, noSideEffect.} = (a.r + b.r, a.c + b.c)
+proc `-`*(a: Coord, b: Coord): Coord {.inline, noSideEffect.} = (a.r - b.r, a.c - b.c)
+proc `*`*(a: Coord, s: int): Coord {.inline, noSideEffect.} = (a.r * s, a.c * s)
 
-proc `+`*(a: Coord3, b: Coord3): Coord3 = (a.x + b.x, a.y + b.y, a.z + b.z)
-proc `-`*(a: Coord3, b: Coord3): Coord3 = (a.x - b.x, a.y - b.y, a.z - b.z)
-proc `*`*(a: Coord3, s: int): Coord3 = (a.x * s, a.y * s, a.z * s)
+proc `+`*(a: Coord3, b: Coord3): Coord3 {.inline, noSideEffect.} = (a.x + b.x,
+    a.y + b.y, a.z + b.z)
+proc `-`*(a: Coord3, b: Coord3): Coord3 {.inline, noSideEffect.} = (a.x - b.x,
+    a.y - b.y, a.z - b.z)
+proc `*`*(a: Coord3, s: int): Coord3 {.inline, noSideEffect.} = (a.x * s, a.y *
+    s, a.z * s)
 
-proc manhattanDistance*(a, b: Coord): int =
+proc manhattanDistance*(a, b: Coord): int {.inline, noSideEffect.} =
   ## Manhattan distance between two 2D coordinates
   abs(a.r - b.r) + abs(a.c - b.c)
 
-proc manhattanDistance*(a, b: Coord3): int =
+proc manhattanDistance*(a, b: Coord3): int {.inline, noSideEffect.} =
   ## Manhattan distance between two 3D coordinates
   abs(a.x - b.x) + abs(a.y - b.y) + abs(a.z - b.z)
 
@@ -56,13 +59,13 @@ proc newGrid*[T](rows, cols: int, default: T): Grid[T] =
   ## Create a grid with dimensions and default value
   newSeqWith(rows, newSeq[T](cols).mapIt(default))
 
-proc width*[T](grid: Grid[T]): int =
+proc width*[T](grid: Grid[T]): int {.inline, noSideEffect.} =
   if grid.len == 0: 0 else: grid[0].len
 
-proc height*[T](grid: Grid[T]): int =
+proc height*[T](grid: Grid[T]): int {.inline, noSideEffect.} =
   grid.len
 
-proc inBounds*[T](grid: Grid[T], pos: Coord): bool =
+proc inBounds*[T](grid: Grid[T], pos: Coord): bool {.inline, noSideEffect.} =
   pos.r >= 0 and pos.r < grid.height and pos.c >= 0 and pos.c < grid.width
 
 proc get*[T](grid: Grid[T], pos: Coord, default: T): T =
@@ -187,11 +190,11 @@ proc parseIntGrid*(lines: seq[string], sep = ""): Grid[int] =
 # CACHE-FRIENDLY GRID OPERATIONS
 # ============================================================================
 
-proc linearIndex*(pos: Coord, width: int): int =
+proc linearIndex*(pos: Coord, width: int): int {.inline, noSideEffect.} =
   ## Convert 2D coordinate to linear index (cache-friendly)
   pos.r * width + pos.c
 
-proc coordFromIndex*(idx: int, width: int): Coord =
+proc coordFromIndex*(idx: int, width: int): Coord {.inline, noSideEffect.} =
   ## Convert linear index back to 2D coordinate
   (idx div width, idx mod width)
 

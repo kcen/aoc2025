@@ -22,6 +22,14 @@ proc day_01*(): Solution =
   var currentNum = 0
   var isNegative = false
 
+  template processTurn() =
+    if currentNum != 0:
+      let turn = if isNegative: -currentNum else: currentNum
+      sweeps += countSweeps(pos, turn)
+      pos = wrapPosition(pos + turn)
+      if pos == 0:
+        at_zero += 1
+
   for c in getInput():
     case c:
       of 'L':
@@ -29,22 +37,12 @@ proc day_01*(): Solution =
       of 'R':
         isNegative = false
       of '0'..'9':
-        currentNum = currentNum * 10 + (int(c) - int('0'))
+        currentNum = currentNum * 10 + (ord(c) - ord('0'))
       else:
-        if currentNum != 0:
-          let turn = if isNegative: -currentNum else: currentNum
-          sweeps += countSweeps(pos, turn)
-          pos = wrapPosition(pos + turn)
-          if pos == 0:
-            at_zero += 1
-          currentNum = 0
+        processTurn()
+        currentNum = 0
 
   # Handle final number if present
-  if currentNum != 0:
-    let turn = if isNegative: -currentNum else: currentNum
-    sweeps += countSweeps(pos, turn)
-    pos = wrapPosition(pos + turn)
-    if pos == 0:
-      at_zero += 1
+  processTurn()
 
   Solution(part_one: $at_zero, part_two: $sweeps)

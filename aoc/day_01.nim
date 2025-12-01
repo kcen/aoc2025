@@ -4,27 +4,27 @@ proc wrapPosition(pos: int): int {.inline, noSideEffect.} =
   let wrapped = pos mod 100
   if wrapped < 0: wrapped + 100 else: wrapped
 
-proc countSweeps(startPos: int, turn: int): int {.inline, noSideEffect.} =
+proc countSweeps(start_pos: int, turn: int): int {.inline, noSideEffect.} =
   # Calculate how many times the dial wraps around (touches 0)
   if turn < 0:
-    let wrapDistance = 100 - startPos - turn
-    result = wrapDistance div 100
-    if startPos == 0:
+    let wrap_distance = 100 - start_pos - turn
+    result = wrap_distance div 100
+    if start_pos == 0:
       result -= 1
   else:
-    result = (startPos + turn) div 100
+    result = (start_pos + turn) div 100
 
 proc day_01*(): Solution =
   var pos = 50
   var sweeps = 0
   var at_zero = 0
 
-  var currentNum = 0
-  var isNegative = false
+  var current_num = 0
+  var is_negative = false
 
   template processTurn() =
-    if currentNum != 0:
-      let turn = if isNegative: -currentNum else: currentNum
+    if current_num != 0:
+      let turn = if is_negative: -current_num else: current_num
       sweeps += countSweeps(pos, turn)
       pos = wrapPosition(pos + turn)
       if pos == 0:
@@ -33,14 +33,14 @@ proc day_01*(): Solution =
   for c in getInput():
     case c:
       of 'L':
-        isNegative = true
+        is_negative = true
       of 'R':
-        isNegative = false
+        is_negative = false
       of '0'..'9':
-        currentNum = currentNum * 10 + (ord(c) - ord('0'))
+        current_num = current_num * 10 + (ord(c) - ord('0'))
       else:
         processTurn()
-        currentNum = 0
+        current_num = 0
 
   # Handle final number if present
   processTurn()

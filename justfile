@@ -33,7 +33,7 @@ profile DAY INPUT:
 
 # Benchmark a specific day (uses optimized binary)
 bench DAY INPUT: build
-  AOC_DAY={{DAY}} AOC_INPUT={{INPUT}} hyperfine -w 2 -u microsecond -N dist/kcen-aoc
+  AOC_DAY={{DAY}} AOC_INPUT={{INPUT}} hyperfine -w 10 -u microsecond -N dist/kcen-aoc
 
 # Create template for a new day
 new DAY:

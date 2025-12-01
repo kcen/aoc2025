@@ -1,0 +1,8 @@
+FROM mattcl/aoc-ci-bencher:latest AS aoc2025-bench
+
+WORKDIR /repo
+
+COPY .dist/ .dist/
+COPY .inputs/ .inputs/
+
+CMD ["bash"]

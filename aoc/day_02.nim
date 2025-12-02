@@ -12,24 +12,25 @@ proc day_02*(): Solution =
     let r: Range = (parts[0], parts[1])
     let minDigits = digitCount(r.start)
     let maxDigits = digitCount(r.ending)
-    
+
     # Generate repeats
     for numDigits in minDigits..maxDigits:
       # pattern_len = k
       for k in 1..(numDigits div 2):
         if numDigits mod k != 0: continue
-        
+
         # multiplier for repeating pattern
         var multiplier = 0
         let reps = numDigits div k
         for j in 0..<reps:
           multiplier += 10 ^ (j * k)
-        
+
         # let minPattern = ceil(r.start / multiplier)
         # let maxPattern = floor(r.ending / multiplier)
-        let minPattern = max(10 ^ (k - 1), (r.start + multiplier - 1) div multiplier)
+        let minPattern = max(10 ^ (k - 1),
+          (r.start + multiplier - 1) div multiplier)
         let maxPattern = min((10 ^ k) - 1, r.ending div multiplier)
-        
+
         if minPattern <= maxPattern:
           for pattern in minPattern..maxPattern:
             let num = pattern * multiplier

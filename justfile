@@ -64,4 +64,4 @@ docker-build:
 
 # Compile inside Docker container
 docker-compile:
-  docker run -itv .:/repo/ aoc2025-dev just build
+  docker run -itv .:/repo/ aoc2025-dev ./ci/scripts/build.sh

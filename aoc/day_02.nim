@@ -4,8 +4,7 @@ import std/[math, sets]
 proc day_02*(): Solution =
   var part_one = 0
   var part_two = 0
-  var part_one_set: HashSet[int]
-  var part_two_set: HashSet[int]
+  var seen: HashSet[int]
 
   for r_str in getInput().parseTokens(','):
     let parts = r_str.parseInts('-')
@@ -25,22 +24,18 @@ proc day_02*(): Solution =
         for j in 0..<reps:
           multiplier += 10 ^ (j * k)
 
-        # let minPattern = ceil(r.start / multiplier)
-        # let maxPattern = floor(r.ending / multiplier)
-        let minPattern = max(10 ^ (k - 1),
-          (r.start + multiplier - 1) div multiplier)
-        let maxPattern = min((10 ^ k) - 1, r.ending div multiplier)
+        let minPattern = max((k - 1).pow10, (r.start + multiplier -
+            1) div multiplier)
+        let maxPattern = min(k.pow10 - 1, r.ending div multiplier)
 
         if minPattern <= maxPattern:
           for pattern in minPattern..maxPattern:
             let num = pattern * multiplier
             if r.contains(num):
-              # All repeating patterns go to part_two_set
-              if not part_two_set.containsOrIncl(num):
-                part_two += num
               # ABAB patterns (k = half of digits) also go to part_one
               if (k == numDigits div 2) and (numDigits mod 2 == 0):
-                if not part_one_set.containsOrIncl(num):
-                  part_one += num
+                part_one += num
+              if not seen.containsOrIncl(num):
+                part_two += num
 
   Solution(part_one: $part_one, part_two: $part_two)

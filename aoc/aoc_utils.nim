@@ -34,6 +34,7 @@ from utils/grid import
 # Mathematical utilities (no factorial functions - they are in combinatorics)
 from utils/math import
   gcd, lcm, gcdSeq, lcmSeq, gcdBinary,
+  POW10_LUT, pow10,
   powMod, modInverse, modAdd, modSub, modMul, modPowFast, chineseRemainder,
   MOD,
   isPrimeFast, smallestPrimeFactor, primeFactorization,
@@ -105,6 +106,7 @@ export
 
   # Math (factorial functions are in combinatorics)
   gcd, lcm, gcdSeq, lcmSeq, gcdBinary,
+  POW10_LUT, pow10,
   powMod, modInverse, modAdd, modSub, modMul, modPowFast, chineseRemainder,
   MOD,
   isPrimeFast, smallestPrimeFactor, primeFactorization,

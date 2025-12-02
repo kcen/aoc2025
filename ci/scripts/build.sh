@@ -1,2 +1,2 @@
-#!/bin/bash
-nimble --out:dist/kcen-aoc -d:danger --mm:orc -d:lto --passC:-march=native c aoc.nim
+#!/bin/sh
+nim --out:dist/kcen-aoc -d:danger --mm:orc -d:lto --passC:-march=native c aoc.nim

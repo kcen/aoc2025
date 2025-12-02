@@ -4,4 +4,4 @@ WORKDIR /repo
 
 COPY . .
 
-CMD ["bash"]
+CMD ["sh"]

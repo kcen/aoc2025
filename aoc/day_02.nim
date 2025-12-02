@@ -1,5 +1,23 @@
 import aoc_utils
-import std/[math, sets]
+import std/[sets]
+
+#maximum number of digits a range value can have (base 10)
+const MaxDigits = 16
+#maximum pattern length we can make under ^
+const MaxK = 8
+
+# multiplies a k-digit pattern to create a d-digit repeating number (e.g., 12 * 101 = 1212)
+proc multiplierLookupTable(): array[MaxDigits, array[MaxK, int]] {.compileTime.} =
+  var res: array[MaxDigits, array[MaxK, int]]
+  for d in 0 ..< MaxDigits:
+    for k in 0 ..< MaxK:
+      var v = 0 #0 for no pattern
+      if k != 0 and d mod k == 0:
+        for j in 0 ..< (d div k):
+          v += (j * k).pow10
+      res[d][k] = v
+  res
+const MULTIPLIER_LUT: array[MaxDigits, array[MaxK, int]] = multiplierLookupTable()
 
 proc day_02*(): Solution =
   var part_one = 0
@@ -16,13 +34,9 @@ proc day_02*(): Solution =
     for numDigits in minDigits..maxDigits:
       # pattern_len = k
       for k in 1..(numDigits div 2):
-        if numDigits mod k != 0: continue
-
         # multiplier for repeating pattern
-        var multiplier = 0
-        let reps = numDigits div k
-        for j in 0..<reps:
-          multiplier += 10 ^ (j * k)
+        var multiplier = MULTIPLIER_LUT[numDigits][k]
+        if multiplier == 0: continue
 
         let minPattern = max((k - 1).pow10, (r.start + multiplier -
             1) div multiplier)
@@ -33,7 +47,7 @@ proc day_02*(): Solution =
             let num = pattern * multiplier
             if r.contains(num):
               # ABAB patterns (k = half of digits) also go to part_one
-              if (k == numDigits div 2) and (numDigits mod 2 == 0):
+              if k * 2 == numDigits:
                 part_one += num
               if not seen.containsOrIncl(num):
                 part_two += num

@@ -1,5 +1,5 @@
 import aoc_utils
-import std/strutils
+import std/parseutils
 
 proc max_joltage(battery_chars: seq[char], on_size: int): int =
   var removals = battery_chars.len - on_size
@@ -10,7 +10,7 @@ proc max_joltage(battery_chars: seq[char], on_size: int): int =
       discard stack.pop()
       removals -= 1
     stack.add digit
-  result = stack[0..(on_size-1)].join().parseInt()
+  discard stack[0..(on_size-1)].parseInt(result)
 
 proc day_03*(): Solution =
   var part1 = 0

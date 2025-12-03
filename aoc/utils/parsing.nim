@@ -28,10 +28,6 @@ proc lineChars*(s: string): seq[seq[char]] =
   ## Convert line to char sequence
   s.split('\n').mapIt(it.toSeq)
 
-proc lineInts*(s: string): seq[seq[int]] =
-  ## Convert line to char sequence
-  s.split('\n').mapIt(it.mapIt(it.ord - '0'.ord))
-
 proc parseChars*(line: string): seq[char] =
   ## Convert line to char sequence
   line.toSeq

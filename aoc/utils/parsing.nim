@@ -24,9 +24,9 @@ proc parseInts*(line: string, sep = ' '): seq[int] =
   ## Parse all integers from a line
   line.split(sep).filterIt(it.len > 0).mapIt(parseInt(it))
 
-proc lineChars*(lines: seq[string]): seq[seq[char]] =
+proc lineChars*(s: string): seq[seq[char]] =
   ## Convert line to char sequence
-  lines.mapIt(it.toSeq)
+  s.split('\n').mapIt(it.toSeq)
 
 proc parseChars*(line: string): seq[char] =
   ## Convert line to char sequence

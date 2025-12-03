@@ -4,25 +4,41 @@
 import std/strutils, std/sequtils
 
 # ============================================================================
-# BASIC PARSING FUNCTIONS
+# BASIC PARSING FUNCTIONS (SIMPLIFIED)
 # ============================================================================
 
 proc parseLines*(s: string): seq[string] =
   ## Parse string into lines, handling both \n and \r\n
-  s.split('\n').filterIt(it.len > 0).mapIt(it.strip)
+  result = @[]
+  let lines = s.split('\n')
+  for line in lines:
+    if line.len > 0:
+      result.add(line.strip())
 
 proc parseSections*(s: string, sep = ""): seq[seq[string]] =
   ## Parse string into sections (separated by blank lines or custom separator)
+  result = @[]
   let separator = if sep == "": "\n\n" else: sep
-  s.strip.split(separator).mapIt(it.strip.parseLines)
+  let parts = s.strip.split(separator)
+  for part in parts:
+    if part.len > 0:
+      result.add(parseLines(part))
 
 proc parseTokens*(line: string, sep = ' '): seq[string] =
   ## Parse line into tokens, removing empty strings
-  line.split(sep).filterIt(it.len > 0)
+  result = @[]
+  let tokens = line.split(sep)
+  for token in tokens:
+    if token.len > 0:
+      result.add(token)
 
 proc parseInts*(line: string, sep = ' '): seq[int] =
   ## Parse all integers from a line
-  line.split(sep).filterIt(it.len > 0).mapIt(parseInt(it))
+  result = @[]
+  let tokens = line.split(sep)
+  for token in tokens:
+    if token.len > 0:
+      result.add(parseInt(token))
 
 proc lineChars*(s: string): seq[seq[char]] =
   ## Convert line to char sequence

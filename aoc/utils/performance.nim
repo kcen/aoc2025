@@ -152,7 +152,7 @@ proc parseIntsFast*(s: string, sep = ' '): seq[int] =
     if c == '-':
       isNegative = true
     elif c.isDigit():
-      currentNum = currentNum * 10 + (int(c) - int('0'))
+      currentNum = currentNum * 10 + (ord(c) - ord('0'))
     elif c == sep or c == '\n':
       if currentNum != 0 or isNegative:
         numbers.add(if isNegative: -currentNum else: currentNum)

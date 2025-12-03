@@ -55,6 +55,12 @@ proc manhattanDistance*(a, b: Coord3): int {.inline, noSideEffect.} =
 type
   Grid*[T] = seq[seq[T]]
 
+  # Memory-efficient flat grid storage for better cache locality
+  FlatGrid*[T] = object
+    data*: seq[T] # Linear storage (largest field first for better alignment)
+    width*: int   # Dimensions
+    height*: int  # Dimensions
+
 proc newGrid*[T](rows, cols: int, default: T): Grid[T] =
   ## Create a grid with dimensions and default value
   newSeqWith(rows, newSeq[T](cols).mapIt(default))
@@ -218,6 +224,115 @@ proc linearToGrid*[T](arr: seq[T], width: int): Grid[T] =
     for c in 0..<width:
       result[r][c] = arr[idx]
       idx.inc
+
+# ============================================================================
+# FLAT GRID OPERATIONS (MEMORY-EFFICIENT)
+# ============================================================================
+
+proc newFlatGrid*[T](width, height: int, default: T): FlatGrid[T] =
+  ## Create a flat grid with dimensions and default value
+  FlatGrid[T](
+    data: newSeq[T](width * height).mapIt(default),
+    width: width,
+    height: height
+  )
+
+proc flatWidth*[T](grid: FlatGrid[T]): int {.inline, noSideEffect.} =
+  grid.width
+
+proc flatHeight*[T](grid: FlatGrid[T]): int {.inline, noSideEffect.} =
+  grid.height
+
+proc flatInBounds*[T](grid: FlatGrid[T], pos: Coord): bool {.inline,
+    noSideEffect.} =
+  pos.r >= 0 and pos.r < grid.height and pos.c >= 0 and pos.c < grid.width
+
+proc flatGet*[T](grid: FlatGrid[T], pos: Coord, default: T): T =
+  if grid.flatInBounds(pos): grid.data[pos.r * grid.width + pos.c] else: default
+
+proc `[]`*[T](grid: FlatGrid[T], pos: Coord): T =
+  grid.data[pos.r * grid.width + pos.c]
+
+proc `[]=`*[T](grid: var FlatGrid[T], pos: Coord, val: T) =
+  grid.data[pos.r * grid.width + pos.c] = val
+
+proc flatNeighbors*[T](grid: FlatGrid[T], pos: Coord, diagonals = false): seq[Coord] =
+  ## Get valid neighbors of a position (flat grid version)
+  let dirs = if diagonals: DIRECTIONS_8.toSeq else: DIRECTIONS_4.toSeq
+  for dir in dirs:
+    let newPos = pos + dir
+    if grid.flatInBounds(newPos):
+      result.add(newPos)
+
+proc flatNeighborsWithValues*[T](grid: FlatGrid[T], pos: Coord,
+    diagonals = false): seq[(Coord, T)] =
+  ## Get valid neighbors with their values (flat grid version)
+  for neighbor in grid.flatNeighbors(pos, diagonals):
+    result.add((neighbor, grid[neighbor]))
+
+proc flatToGrid*[T](flat: FlatGrid[T]): Grid[T] =
+  ## Convert flat grid to nested grid
+  var result = newSeq[seq[T]](flat.height)
+  for r in 0..<flat.height:
+    result[r] = newSeq[T](flat.width)
+    for c in 0..<flat.width:
+      result[r][c] = flat[(r, c)]
+  result
+
+proc gridToFlat*[T](grid: Grid[T]): FlatGrid[T] =
+  ## Convert nested grid to flat grid
+  let height = grid.height
+  let width = grid.width
+  var flat = newFlatGrid[T](width, height, grid[0][0]) # Use first element as default
+  for r in 0..<height:
+    for c in 0..<width:
+      flat[(r, c)] = grid[(r, c)]
+  flat
+
+proc parseCharGridFlat*(lines: seq[string]): FlatGrid[char] =
+  ## Parse lines to flat character grid
+  if lines.len == 0:
+    return FlatGrid[char](data: @[], width: 0, height: 0)
+
+  let width = lines[0].len
+  let height = lines.len
+  var grid = newFlatGrid[char](width, height, ' ')
+  for r, line in lines:
+    for c, ch in line:
+      grid[(r, c)] = ch
+  grid
+
+proc parseIntGridFlat*(lines: seq[string], sep = ""): FlatGrid[int] =
+  ## Parse lines to flat integer grid
+  if lines.len == 0:
+    return FlatGrid[int](data: @[], width: 0, height: 0)
+
+  if sep == "":
+    let width = lines[0].len
+    let height = lines.len
+    var grid = newFlatGrid[int](width, height, 0)
+    for r, line in lines:
+      for c, ch in line:
+        grid[(r, c)] = int(ch) - int('0')
+    grid
+  else:
+    # For separated values, we need to determine width from first line
+    let tokens = lines[0].split(sep[0])
+    var width = 0
+    for token in tokens:
+      if token.len > 0:
+        width += 1
+
+    let height = lines.len
+    var grid = newFlatGrid[int](width, height, 0)
+    for r, line in lines:
+      let rowTokens = line.split(sep[0])
+      var c = 0
+      for token in rowTokens:
+        if token.len > 0:
+          grid[(r, c)] = parseInt(token)
+          c += 1
+    grid
 
 # ============================================================================
 # ITERATORS

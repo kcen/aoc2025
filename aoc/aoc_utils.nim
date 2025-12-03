@@ -1,8 +1,5 @@
 # AOC Utilities Library - Main Interface
 # Comprehensive utilities for Advent of Code solutions
-#
-# Usage: import aoc/aoc_utils
-# This provides access to all utility modules through a single import
 
 # Core utilities (always needed)
 from utils/core import
@@ -143,47 +140,3 @@ export
   sumBatch, minBatch,
   indexSort, argsort,
   binarySearchFirst, binarySearchLast, binarySearchLE, binarySearchGE
-
-# ============================================================================
-# DOCUMENTATION
-# ============================================================================
-
-# This module provides a comprehensive set of utilities for solving Advent of Code problems.
-#
-# Key features:
-# - Input/output utilities for AOC data
-# - String parsing and extraction functions
-# - 2D/3D coordinate and grid operations
-# - Mathematical utilities (GCD, LCM, modular arithmetic, etc.)
-# - Combinatorics (combinations, permutations) - INCLUDES FACTORIALS
-# - Memoization templates - Transform exponential algorithms to linear
-# - Bit manipulation and performance optimizations
-# - SIMD-friendly and branch-free operations
-#
-# Example usage:
-# ```
-# import aoc/aoc_utils
-#
-# let input = getInput()
-# let lines = input.parseLines()
-# let numbers = lines[0].parseInts()
-#
-# let grid = parseCharGrid(lines)
-# let positions = findAll(grid, proc(c: char): bool = c == 'X')
-#
-# let result = sumH(numbers)
-# echo printSolution(Solution(part_one: $result, part_two: "42"))
-# ```
-#
-# For memoization examples:
-# ```
-# # Transform exponential Fibonacci to linear
-# memoizeRec(fib):
-#   if n <= 1: n
-#   else: fib(n - 1) + fib(n - 2)
-#
-# let fib40 = fib(40)  # Now fast!
-# ```
-#
-# For best performance, compile with:
-# nim c -d:release --opt:speed --gc:arc solution.nim

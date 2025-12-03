@@ -3,6 +3,7 @@
 
 import std/[strutils, os, algorithm]
 import ./grid # Import Coord3 type for 3D range operations
+import ./parsing
 
 # ============================================================================
 # INPUT/OUTPUT SECTION

@@ -1,23 +1,37 @@
 import aoc_utils
-import std/parseutils
 
-proc max_joltage(battery_chars: seq[char], on_size: int): int =
-  var removals = battery_chars.len - on_size
-  var stack: seq[char] = @[]
+proc max_joltage(battery_ints: seq[int]): (int, int) =
+  const on_size = 12
+  const small_on_size = 2
 
-  for digit in battery_chars:
-    while removals > 0 and stack.len > 0 and stack[^1].ord < digit.ord:
-      discard stack.pop()
-      removals -= 1
-    stack.add digit
-  discard stack[0..(on_size-1)].parseInt(result)
+  var removals = battery_ints.len - on_size
+  var stack: array[100, int] #preallocate 100 slots
+  var stack_ptr = 0
+
+  for d in battery_ints:
+    while removals > 0 and stack_ptr > 0 and stack[stack_ptr-1] < d:
+      dec stack_ptr
+      dec removals
+    stack[stack_ptr] = d
+    inc stack_ptr
+
+  # use 1 stack for both
+  var part1 = 0
+  var part2 = 0
+  for i in 0 ..< on_size:
+    if i < small_on_size:
+      part1 = part1 * 10 + stack[i]
+    part2 = part2 * 10 + stack[i]
+
+  result = (part1, part2)
 
 proc day_03*(): Solution =
   var part1 = 0
   var part2 = 0
 
-  for bank in getInput().lineChars():
-    part1 += max_joltage(bank, 2)
-    part2 += max_joltage(bank, 12)
+  for bank in getInput().lineInts():
+    let (p1, p2) = max_joltage(bank)
+    part1 += p1
+    part2 += p2
 
   result = Solution(part_one: $part1, part_two: $part2)

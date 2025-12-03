@@ -10,7 +10,7 @@ proc countSweeps(start_pos: int, turn: int): int {.inline, noSideEffect.} =
     let wrap_distance = 100 - start_pos - turn
     result = wrap_distance div 100
     if start_pos == 0:
-      result -= 1
+      dec result
   else:
     result = (start_pos + turn) div 100
 
@@ -28,7 +28,7 @@ proc day_01*(): Solution =
       sweeps += countSweeps(pos, turn)
       pos = wrapPosition(pos + turn)
       if pos == 0:
-        at_zero += 1
+        inc at_zero
 
   for c in getInput():
     case c:

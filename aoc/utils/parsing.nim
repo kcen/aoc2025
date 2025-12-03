@@ -34,6 +34,7 @@ proc parseTokens*(line: string, sep = ' '): seq[string] =
 
 proc parseInts*(line: string, sep = ' '): seq[int] =
   ## Parse line into sequence of integers
+  ## Fast implementation using split and parseInt
   result = @[]
   let tokens = line.split(sep)
   for token in tokens:
@@ -49,26 +50,106 @@ proc parseChars*(line: string): seq[char] =
   line.toSeq
 
 # ============================================================================
+# SCANF-BASED PARSING UTILITIES
+# ============================================================================
+
+proc parseRange*(line: string): tuple[start, ending: int] =
+  ## Parse range format "start-end" into tuple
+  ## Uses scanf for optimal performance
+  var start, ending: int
+  if scanf(line, "$i-$i", start, ending):
+    result = (start, ending)
+  else:
+    raise newException(ValueError, "Invalid range format: " & line)
+
+proc parseIntLine*(line: string, expectedCount: int = -1): seq[int] =
+  ## Parse integers from a line, optionally specifying expected count
+  ## Optimized using scanf patterns
+  if expectedCount == -1:
+    # Parse all integers on the line using scanTuple for efficiency
+    result = @[]
+    var i = 0
+    while i < line.len:
+      var success = false
+      var val: int
+      let remaining = line[i .. ^1]
+      if scanf(remaining, "$i", val):
+        result.add(val)
+        # Move past the parsed integer
+        while i < line.len and (line[i].isDigit or line[i] == '-'):
+          i.inc
+        while i < line.len and not (line[i].isDigit or line[i] == '-'):
+          i.inc
+        continue
+      i.inc
+  elif expectedCount == 1:
+    # Parse single integer
+    var val: int
+    if scanf(line, "$i", val):
+      return @[val]
+    else:
+      raise newException(ValueError, "Expected single integer, got: " & line)
+  elif expectedCount == 2:
+    # Parse two integers
+    var a, b: int
+    if scanf(line, "$i $i", a, b):
+      return @[a, b]
+    else:
+      raise newException(ValueError, "Expected two integers, got: " & line)
+  elif expectedCount == 3:
+    # Parse three integers
+    var a, b, c: int
+    if scanf(line, "$i $i $i", a, b, c):
+      return @[a, b, c]
+    else:
+      raise newException(ValueError, "Expected three integers, got: " & line)
+  else:
+    # Fall back to manual extraction and validate count
+    result = @[]
+    var i = 0
+    while i < line.len:
+      var val: int
+      let remaining = line[i .. ^1]
+      if scanf(remaining, "$i", val):
+        result.add(val)
+        while i < line.len and (line[i].isDigit or line[i] == '-'):
+          i.inc
+        while i < line.len and not (line[i].isDigit or line[i] == '-'):
+          i.inc
+        continue
+      i.inc
+
+    if result.len != expectedCount:
+      raise newException(ValueError, "Expected " & $expectedCount &
+          " integers, got " & $result.len & ": " & line)
+
+# ============================================================================
 # EXTRACTION FUNCTIONS
 # ============================================================================
 
 proc extractInts*(s: string): seq[int] =
   ## Extract all integers from string
-  var extracted: seq[int] = @[]
+  ## Optimized using scanTuple for better performance
+  result = @[]
   var i = 0
+
   while i < s.len:
-    if s[i].isDigit or (s[i] == '-' and i + 1 < s.len and s[i+1].isDigit):
-      var num = ""
-      if s[i] == '-':
-        num.add('-')
-        i.inc
-      while i < s.len and s[i].isDigit:
-        num.add(s[i])
-        i.inc
-      extracted.add(parseInt(num))
-    else:
+    # Skip non-digit characters (but keep minus signs)
+    while i < s.len and not (s[i].isDigit or s[i] == '-'):
       i.inc
-  extracted
+    if i >= s.len:
+      break
+
+    # Use scanf to parse the integer starting at position i
+    let remaining = s[i .. ^1]
+    var parsed: int
+    if scanf(remaining, "$i", parsed):
+      result.add(parsed)
+      # Move past the parsed integer
+      while i < s.len and (s[i].isDigit or s[i] == '-'):
+        i.inc
+    else:
+      i.inc # Fallback: advance by one if scanf fails
 
 proc countOccurrences*(s: string, sub: string): int =
   ## Count occurrences of substring in string
@@ -125,7 +206,8 @@ proc matchPattern*[T](pattern: seq[T], text: seq[T]): seq[int] =
 
 import std/tables
 
-template memoize*(fnName: untyped, argType: typedesc, resultType: typedesc): untyped =
+template memoize*(fnName: untyped, argType: typedesc,
+    resultType: typedesc): untyped =
   ## Generic memoization template for single-argument functions
   var cache: Table[argType, resultType] = initTable[argType, resultType]()
 

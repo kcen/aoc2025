@@ -87,4 +87,31 @@ suite "String Utilities":
     check 3 in matches
     check 5 in matches
 
+suite "Scanf-based Parsing Utilities":
+  test "parseRange: parses range format correctly":
+    let result = parseRange("123-456")
+    check result.start == 123
+    check result.finish == 456
+
+  test "parseRange: handles negative numbers":
+    let result = parseRange("-10--5")
+    check result.start == -10
+    check result.finish == -5
+
+  test "parseIntLine: parses all integers by default":
+    let result = parseIntLine("10 20 30")
+    check result == @[10, 20, 30]
+
+  test "parseIntLine: validates single integer":
+    let result = parseIntLine("42", 1)
+    check result == @[42]
+
+  test "parseIntLine: validates two integers":
+    let result = parseIntLine("10 20", 2)
+    check result == @[10, 20]
+
+  test "parseIntLine: validates three integers":
+    let result = parseIntLine("1 2 3", 3)
+    check result == @[1, 2, 3]
+
 echo "Parsing utility tests completed!"

@@ -12,7 +12,8 @@ from utils/core import
 from utils/parsing import
   parseLines, parseSections, parseTokens, parseInts, parseChars,
   lineChars, extractInts, countOccurrences,
-  isPalindrome, allPalindromes, matchPattern
+  isPalindrome, allPalindromes, matchPattern,
+  parseRange, parseIntLine
 
 # Grid and coordinate utilities
 from utils/grid import
@@ -87,6 +88,7 @@ export
   parseLines, parseSections, parseTokens, parseInts, parseChars,
   lineChars, extractInts, countOccurrences,
   isPalindrome, allPalindromes, matchPattern,
+  parseRange, parseIntLine,
 
   # Grid
   Coord, Coord3, Direction, Direction3,

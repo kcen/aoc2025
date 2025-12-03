@@ -1,14 +1,13 @@
 # String Parsing Utilities for AOC
 # Comprehensive string parsing functions for common AOC patterns
 
-import std/strutils, std/sequtils
+import std/strutils, std/sequtils, std/strscans
 
 # ============================================================================
-# BASIC PARSING FUNCTIONS (SIMPLIFIED)
+# BASIC PARSING FUNCTIONS
 # ============================================================================
 
 proc parseLines*(s: string): seq[string] =
-  ## Parse string into lines, handling both \n and \r\n
   result = @[]
   let lines = s.split('\n')
   for line in lines:
@@ -16,7 +15,6 @@ proc parseLines*(s: string): seq[string] =
       result.add(line.strip())
 
 proc parseSections*(s: string, sep = ""): seq[seq[string]] =
-  ## Parse string into sections (separated by blank lines or custom separator)
   result = @[]
   let separator = if sep == "": "\n\n" else: sep
   let parts = s.strip.split(separator)
@@ -25,7 +23,6 @@ proc parseSections*(s: string, sep = ""): seq[seq[string]] =
       result.add(parseLines(part))
 
 proc parseTokens*(line: string, sep = ' '): seq[string] =
-  ## Parse line into tokens, removing empty strings
   result = @[]
   let tokens = line.split(sep)
   for token in tokens:
@@ -33,7 +30,6 @@ proc parseTokens*(line: string, sep = ' '): seq[string] =
       result.add(token)
 
 proc parseInts*(line: string, sep = ' '): seq[int] =
-  ## Parse all integers from a line
   result = @[]
   let tokens = line.split(sep)
   for token in tokens:
@@ -41,11 +37,9 @@ proc parseInts*(line: string, sep = ' '): seq[int] =
       result.add(parseInt(token))
 
 proc lineChars*(s: string): seq[seq[char]] =
-  ## Convert line to char sequence
   s.split('\n').mapIt(it.toSeq)
 
 proc parseChars*(line: string): seq[char] =
-  ## Convert line to char sequence
   line.toSeq
 
 # ============================================================================
@@ -53,7 +47,6 @@ proc parseChars*(line: string): seq[char] =
 # ============================================================================
 
 proc extractInts*(s: string): seq[int] =
-  ## Extract all integers from string (including negative)
   var extracted: seq[int] = @[]
   var i = 0
   while i < s.len:
@@ -71,7 +64,6 @@ proc extractInts*(s: string): seq[int] =
   extracted
 
 proc countOccurrences*(s: string, sub: string): int =
-  ## Count non-overlapping occurrences of substring
   var count = 0
   var idx = 0
   while true:
@@ -86,14 +78,12 @@ proc countOccurrences*(s: string, sub: string): int =
 # ============================================================================
 
 proc isPalindrome*(s: string): bool =
-  # Manual reversal for strings since .reversed() doesn't exist on strings
   for i in 0..<s.len div 2:
     if s[i] != s[s.len - 1 - i]:
       return false
   true
 
 proc allPalindromes*(s: string): seq[string] =
-  ## Find all palindromic substrings
   var found: seq[string] = @[]
   for i in 0..<s.len:
     for j in i..<s.len:
@@ -103,7 +93,6 @@ proc allPalindromes*(s: string): seq[string] =
   found
 
 proc matchPattern*[T](pattern: seq[T], text: seq[T]): seq[int] =
-  ## Simple pattern matching (KMP would be better for large inputs)
   var matches: seq[int] = @[]
   if pattern.len == 0 or pattern.len > text.len:
     return matches
@@ -125,7 +114,6 @@ proc matchPattern*[T](pattern: seq[T], text: seq[T]): seq[int] =
 
 import std/tables
 
-# Template for creating memoized versions of functions
 template memoize*(fnName: untyped, argType: typedesc,
     resultType: typedesc): untyped =
   var cache: Table[argType, resultType] = initTable[argType, resultType]()
@@ -134,13 +122,11 @@ template memoize*(fnName: untyped, argType: typedesc,
     if n in cache:
       cache[n]
     else:
-      let result = fnName(n) # Note: This needs to be defined separately
+      let result = fnName(n)
       cache[n] = result
       result
 
-# Specific memoization templates for common patterns
 template memoizeRec*(fnName: untyped, `fn`: untyped): untyped =
-  ## Memoize a recursive function with automatic caching
   var cache: Table[int, int] = initTable[int, int]()
 
   template `fnName`*(n: int): int =
@@ -151,7 +137,6 @@ template memoizeRec*(fnName: untyped, `fn`: untyped): untyped =
       cache[n] = result
       result
 
-# Example usage for fibonacci:
 template memoizeFib*: untyped =
   var cache: Table[int, int] = initTable[int, int]()
   cache[0] = 0
@@ -165,7 +150,6 @@ template memoizeFib*: untyped =
       cache[n] = result
       result
 
-# More flexible memoization for multi-argument functions
 template memoize2*(fnName: untyped, `fn`: untyped): untyped =
   var cache: Table[(int, int), int] = initTable[(int, int), int]()
 

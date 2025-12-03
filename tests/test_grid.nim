@@ -140,6 +140,71 @@ suite "Grid Operations":
     check grid[0][0] == 1
     check grid[1][2] == 6
 
+# ============================================================================
+# FLAT GRID TESTS
+# ============================================================================
+  test "newFlatGrid: create flat grid":
+    let grid = newFlatGrid[int](3, 2, 0)
+    check grid.width == 3
+    check grid.height == 2
+    check grid.data.len == 6
+
+  test "flatGrid access: get and set values":
+    var grid = newFlatGrid[int](2, 2, 0)
+    grid[(0, 0)] = 5
+    grid[(1, 1)] = 10
+    check grid[(0, 0)] == 5
+    check grid[(1, 1)] == 10
+
+  test "flatInBounds: check boundaries":
+    let grid = newFlatGrid[int](3, 3, 0)
+    check grid.flatInBounds((0, 0)) == true
+    check grid.flatInBounds((2, 2)) == true
+    check grid.flatInBounds((3, 3)) == false
+    check grid.flatInBounds((-1, 0)) == false
+
+  test "flatNeighbors: 4-connectivity":
+    let grid = newFlatGrid[int](5, 5, 0)
+    let neighbors = grid.flatNeighbors((2, 2), diagonals = false)
+    check neighbors.len == 4
+    check (1, 2) in neighbors
+    check (3, 2) in neighbors
+    check (2, 1) in neighbors
+    check (2, 3) in neighbors
+
+  test "flatNeighbors: 8-connectivity":
+    let grid = newFlatGrid[int](5, 5, 0)
+    let neighbors = grid.flatNeighbors((2, 2), diagonals = true)
+    check neighbors.len == 8
+    check (1, 1) in neighbors
+    check (1, 2) in neighbors
+    check (1, 3) in neighbors
+
+  test "parseCharGridFlat: create flat character grid":
+    let lines = @["ABC", "DEF", "GHI"]
+    let grid = parseCharGridFlat(lines)
+    check grid.height == 3
+    check grid.width == 3
+    check grid[(0, 0)] == 'A'
+    check grid[(2, 2)] == 'I'
+
+  test "parseIntGridFlat: create flat integer grid":
+    let lines = @["123", "456"]
+    let grid = parseIntGridFlat(lines, "")
+    check grid.height == 2
+    check grid.width == 3
+    check grid[(0, 0)] == 1
+    check grid[(1, 2)] == 6
+
+  test "gridToFlat and flatToGrid: conversion round-trip":
+    let original = parseCharGrid(@["AB", "CD"])
+    let flat = gridToFlat(original)
+    let converted = flatToGrid(flat)
+    check converted.height == original.height
+    check converted.width == original.width
+    check converted[0][0] == original[0][0]
+    check converted[1][1] == original[1][1]
+
 suite "Cache-Friendly Operations":
   test "linearIndex: convert 2D to 1D":
     let pos: Coord = (2, 3)

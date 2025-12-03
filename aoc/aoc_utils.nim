@@ -14,7 +14,7 @@ from utils/core import
 # Parsing utilities
 from utils/parsing import
   parseLines, parseSections, parseTokens, parseInts, parseChars,
-  extractInts, countOccurrences,
+  lineChars, extractInts, countOccurrences,
   isPalindrome, allPalindromes, matchPattern
 
 # Grid and coordinate utilities
@@ -88,7 +88,7 @@ export
 
   # Parsing
   parseLines, parseSections, parseTokens, parseInts, parseChars,
-  extractInts, countOccurrences,
+  lineChars, extractInts, countOccurrences,
   isPalindrome, allPalindromes, matchPattern,
 
   # Grid

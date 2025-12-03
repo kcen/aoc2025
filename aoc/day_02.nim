@@ -7,7 +7,8 @@ const MaxDigits = 16
 const MaxK = 8
 
 # multiplies a k-digit pattern to create a d-digit repeating number (e.g., 12 * 101 = 1212)
-proc multiplierLookupTable(): array[MaxDigits, array[MaxK, int]] {.compileTime.} =
+proc multiplierLookupTable(): array[MaxDigits, array[MaxK,
+    int]] {.compileTime.} =
   var res: array[MaxDigits, array[MaxK, int]]
   for d in 0 ..< MaxDigits:
     for k in 0 ..< MaxK:
@@ -17,7 +18,8 @@ proc multiplierLookupTable(): array[MaxDigits, array[MaxK, int]] {.compileTime.}
           v += (j * k).pow10
       res[d][k] = v
   res
-const MULTIPLIER_LUT: array[MaxDigits, array[MaxK, int]] = multiplierLookupTable()
+const MULTIPLIER_LUT: array[MaxDigits, array[MaxK,
+    int]] = multiplierLookupTable()
 
 proc day_02*(): Solution =
   var part_one = 0

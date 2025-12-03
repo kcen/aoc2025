@@ -147,24 +147,5 @@ proc cacheSize*[T, U](cache: Table[T, U]): int =
   cache.len
 
 proc hasCachedValue*[T, U](cache: Table[T, U], key: T): bool =
-  ## Check if value is cached (useful for debugging)
+  ## Check if value is cached
   cache.hasKey(key)
-
-# ============================================================================
-# USAGE EXAMPLES
-# ============================================================================
-
-# Example 1: Fibonacci sequence
-# template memoizeFibonacci* must be defined first
-# Then: let fib40 = fibonacciMemoized(40)  # Instant vs exponential
-
-# Example 2: Custom recursive function
-# memoizeRec(countWays):
-#   if n == 0: 1
-#   elif n < 0: 0
-#   else: countWays(n-1) + countWays(n-2)
-
-# Example 3: Two-argument function (like nCr)
-# memoize2Args(nCr):
-#   if r == 0 or r == n: 1
-#   else: nCr(n-1, r-1) + nCr(n-1, r)

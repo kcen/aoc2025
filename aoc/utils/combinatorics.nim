@@ -2,9 +2,7 @@
 # Combinations, permutations, and mathematical combinatorics
 
 import std/sequtils
-import ./math # Import powMod function
-
-# import std/sequtils  # Uncomment if needed
+import ./math
 
 # ============================================================================
 # BASIC COMBINATORICS

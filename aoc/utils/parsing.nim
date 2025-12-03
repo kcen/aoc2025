@@ -8,6 +8,7 @@ import std/strutils, std/sequtils, std/strscans
 # ============================================================================
 
 proc parseLines*(s: string): seq[string] =
+  ## Split string into non-empty lines
   result = @[]
   let lines = s.split('\n')
   for line in lines:
@@ -15,6 +16,7 @@ proc parseLines*(s: string): seq[string] =
       result.add(line.strip())
 
 proc parseSections*(s: string, sep = ""): seq[seq[string]] =
+  ## Split string into sections separated by blank lines
   result = @[]
   let separator = if sep == "": "\n\n" else: sep
   let parts = s.strip.split(separator)
@@ -23,6 +25,7 @@ proc parseSections*(s: string, sep = ""): seq[seq[string]] =
       result.add(parseLines(part))
 
 proc parseTokens*(line: string, sep = ' '): seq[string] =
+  ## Split line into non-empty tokens
   result = @[]
   let tokens = line.split(sep)
   for token in tokens:
@@ -30,6 +33,7 @@ proc parseTokens*(line: string, sep = ' '): seq[string] =
       result.add(token)
 
 proc parseInts*(line: string, sep = ' '): seq[int] =
+  ## Parse line into sequence of integers
   result = @[]
   let tokens = line.split(sep)
   for token in tokens:
@@ -37,9 +41,11 @@ proc parseInts*(line: string, sep = ' '): seq[int] =
       result.add(parseInt(token))
 
 proc lineChars*(s: string): seq[seq[char]] =
+  ## Split string into lines of characters
   s.split('\n').mapIt(it.toSeq)
 
 proc parseChars*(line: string): seq[char] =
+  ## Convert string to sequence of characters
   line.toSeq
 
 # ============================================================================
@@ -47,6 +53,7 @@ proc parseChars*(line: string): seq[char] =
 # ============================================================================
 
 proc extractInts*(s: string): seq[int] =
+  ## Extract all integers from string
   var extracted: seq[int] = @[]
   var i = 0
   while i < s.len:
@@ -64,6 +71,7 @@ proc extractInts*(s: string): seq[int] =
   extracted
 
 proc countOccurrences*(s: string, sub: string): int =
+  ## Count occurrences of substring in string
   var count = 0
   var idx = 0
   while true:
@@ -78,12 +86,14 @@ proc countOccurrences*(s: string, sub: string): int =
 # ============================================================================
 
 proc isPalindrome*(s: string): bool =
+  ## Check if string is a palindrome
   for i in 0..<s.len div 2:
     if s[i] != s[s.len - 1 - i]:
       return false
   true
 
 proc allPalindromes*(s: string): seq[string] =
+  ## Find all palindromic substrings
   var found: seq[string] = @[]
   for i in 0..<s.len:
     for j in i..<s.len:
@@ -93,6 +103,7 @@ proc allPalindromes*(s: string): seq[string] =
   found
 
 proc matchPattern*[T](pattern: seq[T], text: seq[T]): seq[int] =
+  ## Find all indices where pattern matches in text
   var matches: seq[int] = @[]
   if pattern.len == 0 or pattern.len > text.len:
     return matches
@@ -114,8 +125,8 @@ proc matchPattern*[T](pattern: seq[T], text: seq[T]): seq[int] =
 
 import std/tables
 
-template memoize*(fnName: untyped, argType: typedesc,
-    resultType: typedesc): untyped =
+template memoize*(fnName: untyped, argType: typedesc, resultType: typedesc): untyped =
+  ## Generic memoization template for single-argument functions
   var cache: Table[argType, resultType] = initTable[argType, resultType]()
 
   template fnName*(n: argType): resultType =
@@ -127,6 +138,7 @@ template memoize*(fnName: untyped, argType: typedesc,
       result
 
 template memoizeRec*(fnName: untyped, `fn`: untyped): untyped =
+  ## Memoize a recursive int->int function
   var cache: Table[int, int] = initTable[int, int]()
 
   template `fnName`*(n: int): int =
@@ -138,6 +150,7 @@ template memoizeRec*(fnName: untyped, `fn`: untyped): untyped =
       result
 
 template memoizeFib*: untyped =
+  ## Memoized Fibonacci sequence template
   var cache: Table[int, int] = initTable[int, int]()
   cache[0] = 0
   cache[1] = 1
@@ -151,6 +164,7 @@ template memoizeFib*: untyped =
       result
 
 template memoize2*(fnName: untyped, `fn`: untyped): untyped =
+  ## Memoize a two-argument int function
   var cache: Table[(int, int), int] = initTable[(int, int), int]()
 
   template fnName*(a, b: int): int =

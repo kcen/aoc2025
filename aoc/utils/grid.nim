@@ -2,7 +2,6 @@
 # 2D/3D coordinate handling, grid manipulation, and spatial algorithms
 
 import std/[sequtils, algorithm, strutils]
-# from std/strscans import scanTuple  # Uncomment if scanTuple is needed
 
 # ============================================================================
 # COORDINATE TYPES

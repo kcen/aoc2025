@@ -4,10 +4,9 @@
 import std/strutils
 
 # ============================================================================
-# LOOKUP TABLES FOR PERFORMANCE
+# LOOKUP TABLES
 # ============================================================================
 
-# Pre-computed digit sum table for fast digit operations
 const DIGIT_SUM_LUT*: array[1000, uint8] = block:
   var lut: array[1000, uint8]
   for i in 0..<1000:
@@ -19,7 +18,6 @@ const DIGIT_SUM_LUT*: array[1000, uint8] = block:
     lut[i] = s
   lut
 
-# Hamming weight (popcount) LUT
 const POPCOUNT_LUT*: array[256, uint8] = block:
   var lut: array[256, uint8]
   for i in 0..<256:
@@ -31,7 +29,6 @@ const POPCOUNT_LUT*: array[256, uint8] = block:
     lut[i] = count
   lut
 
-# ASCII character classification LUT
 const CHAR_CLASS_LUT*: array[256, uint8] = block:
   var lut: array[256, uint8]
   for i in 0..<256:
@@ -63,13 +60,12 @@ const
 # ============================================================================
 
 proc digitSumLUT*(n: int): int =
-  ## O(1) digit sum using LUT (for n in [0, 999])
+  ## Fast digit sum using lookup table
   if n < 0:
     digitSumLUT(-n)
   elif n < 1000:
     int(DIGIT_SUM_LUT[n])
   else:
-    # Fallback: sum digit ranges
     let a = n div 1000
     let b = n mod 1000
     digitSumLUT(a) + int(DIGIT_SUM_LUT[b])
@@ -85,9 +81,11 @@ proc popcountLUT*(x: int): int =
   result = count
 
 proc isDigitLUT*(c: char): bool =
+  ## Check if character is digit using lookup table
   (CHAR_CLASS_LUT[ord(c)] and CHAR_IS_DIGIT) != 0
 
 proc isAlphaLUT*(c: char): bool =
+  ## Check if character is alphabetic using lookup table
   (CHAR_CLASS_LUT[ord(c)] and CHAR_IS_ALPHA) != 0
 
 # ============================================================================
@@ -104,15 +102,19 @@ proc popcount*(x: int): int =
   count
 
 proc hasBit*(x: int, bit: int): bool =
+  ## Check if bit at position is set
   (x and (1 shl bit)) != 0
 
 proc setBit*(x: int, bit: int): int =
+  ## Set bit at position
   x or (1 shl bit)
 
 proc clearBit*(x: int, bit: int): int =
+  ## Clear bit at position
   x and (not (1 shl bit))
 
 proc toggleBit*(x: int, bit: int): int =
+  ## Toggle bit at position
   x xor (1 shl bit)
 
 proc setBits*(x: int, start, count: int): int =
@@ -127,12 +129,15 @@ proc setBits*(x: int, start, count: int): int =
 # ============================================================================
 
 proc isEven*(x: int): bool =
+  ## Check if integer is even
   (x and 1) == 0
 
 proc isOdd*(x: int): bool =
+  ## Check if integer is odd
   (x and 1) != 0
 
 proc isPowerOf2*(x: int): bool =
+  ## Check if integer is a power of 2
   x > 0 and (x and (x - 1)) == 0
 
 proc roundUpToPowerOf2*(x: int): int =
@@ -182,20 +187,24 @@ type
   BitPacked4*[T] = distinct uint32 ## 4 packed values in one u32
 
 proc initBitPacked8*(): BitPacked8[bool] =
+  ## Initialize 8-bit packed boolean array
   result = BitPacked8[bool](0u64)
 
 proc initBitPacked4*(): BitPacked4[bool] =
+  ## Initialize 4-bit packed boolean array
   result = BitPacked4[bool](0u32)
 
 proc setBit8*[T](packed: var BitPacked8[T], idx: int, val: bool) =
-  ## Set boolean at index (0-7)
+  ## Set boolean at index in packed array
   if val:
     packed = BitPacked8[T](uint64(packed) or (1u64 shl idx))
   else:
     packed = BitPacked8[T](uint64(packed) and (not (1u64 shl idx)))
 
 proc getBit8*[T](packed: BitPacked8[T], idx: int): bool =
+  ## Get boolean at index in packed array
   (uint64(packed) and (1u64 shl idx)) != 0
 
 proc countSetBits8*[T](packed: BitPacked8[T]): int =
+  ## Count set bits in packed array
   popcountLUT(int(uint64(packed)))

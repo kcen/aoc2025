@@ -51,18 +51,18 @@ suite "Vector Operations":
 suite "Array Operations":
   test "prefixSum: compute prefix sums":
     let arr = @[1, 2, 3, 4, 5]
-    let result = prefixSum(arr)
-    check result == @[1, 3, 6, 10, 15]
+    let value = prefixSum(arr)
+    check value == @[1, 3, 6, 10, 15]
 
   test "suffixSum: compute suffix sums":
     let arr = @[1, 2, 3, 4, 5]
-    let result = suffixSum(arr)
-    check result == @[15, 14, 12, 9, 5]
+    let value = suffixSum(arr)
+    check value == @[15, 14, 12, 9, 5]
 
   test "pairwiseDifferences: consecutive differences":
     let arr = @[1, 4, 2, 7, 5]
-    let result = pairwiseDifferences(arr)
-    check result == @[3, -2, 5, -2]
+    let value = pairwiseDifferences(arr)
+    check value == @[3, -2, 5, -2]
 
 suite "Fast Search":
   test "binarySearchFirst: find first occurrence":
@@ -95,14 +95,12 @@ suite "Range Operations":
   test "intersection: find common range":
     let r1: Range = (1, 5)
     let r2: Range = (3, 8)
-    let result = intersection(r1, r2)
-    check result == (3, 5)
+    let value = intersection(r1, r2)
+    check value == (3, 5)
 
   test "mergeRanges: coalesce overlapping":
     let ranges = @[(1, 3), (2, 5), (7, 9)]
-    let result = mergeRanges(ranges)
-    check result.len == 2
-    check result[0] == (1, 5)
-    check result[1] == (7, 9)
-
-echo "Performance utility tests completed!"
+    let value = mergeRanges(ranges)
+    check value.len == 2
+    check value[0] == (1, 5)
+    check value[1] == (7, 9)

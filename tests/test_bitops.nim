@@ -36,18 +36,18 @@ suite "Basic Bit Manipulation":
 
   test "setBit: set a bit":
     var x = 0b1010
-    let result = setBit(x, 0)
-    check result == 0b1011
+    let value = setBit(x, 0)
+    check value == 0b1011
 
   test "clearBit: clear a bit":
     let x = 0b1010
-    let result = clearBit(x, 1)
-    check result == 0b1000
+    let value = clearBit(x, 1)
+    check value == 0b1000
 
   test "toggleBit: flip a bit":
     let x = 0b1010
-    let result = toggleBit(x, 0)
-    check result == 0b1011
+    let value = toggleBit(x, 0)
+    check value == 0b1011
 
 suite "Bit Mathematics":
   test "isEven: check if even":
@@ -99,5 +99,3 @@ suite "Bit Packing":
     check getBit8(packed, 3) == false
     check getBit8(packed, 4) == true
     check getBit8(packed, 5) == false
-
-echo "Bit operations utility tests completed!"

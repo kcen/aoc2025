@@ -1,7 +1,7 @@
 # Grid Operations and Coordinate Types for AOC
 # 2D/3D coordinate handling, grid manipulation, and spatial algorithms
 
-import std/[sequtils, algorithm, strutils]
+import std/[sequtils, algorithm, strutils, tables]
 
 # ============================================================================
 # COORDINATE TYPES
@@ -110,12 +110,10 @@ proc mapGrid*[T, U](grid: Grid[T], fn: proc(x: T): U): Grid[U] =
 
 proc filterGrid*[T](grid: Grid[T], predicate: proc(x: T): bool): seq[(Coord, T)] =
   ## Find all positions matching predicate
-  var result: seq[(Coord, T)] = @[]
   for r in 0..<grid.height:
     for c in 0..<grid.width:
       if predicate(grid[r][c]):
         result.add(((r, c), grid[r][c]))
-  result
 
 proc findFirst*[T](grid: Grid[T], predicate: proc(x: T): bool): Coord =
   ## Find first position matching predicate
@@ -205,13 +203,13 @@ proc coordFromIndex*(idx: int, width: int): Coord {.inline, noSideEffect.} =
 
 proc gridToLinear*[T](grid: Grid[T]): seq[T] =
   ## Flatten grid for better cache locality in sequential access
-  var result = newSeq[T](grid.height * grid.width)
+  var linear = newSeq[T](grid.height * grid.width)
   var idx = 0
   for row in grid:
     for cell in row:
-      result[idx] = cell
+      linear[idx] = cell
       idx.inc
-  result
+  linear
 
 proc linearToGrid*[T](arr: seq[T], width: int): Grid[T] =
   ## Reshape linear array back to 2D grid
@@ -225,7 +223,7 @@ proc linearToGrid*[T](arr: seq[T], width: int): Grid[T] =
       idx.inc
 
 # ============================================================================
-# FLAT GRID OPERATIONS (MEMORY-EFFICIENT)
+# FLAT GRID OPERATIONS (MEMORY-EFFICIENT, SAME INTERFACE AS GRID)
 # ============================================================================
 
 proc newFlatGrid*[T](width, height: int, default: T): FlatGrid[T] =
@@ -236,18 +234,18 @@ proc newFlatGrid*[T](width, height: int, default: T): FlatGrid[T] =
     height: height
   )
 
-proc flatWidth*[T](grid: FlatGrid[T]): int {.inline, noSideEffect.} =
+proc width*[T](grid: FlatGrid[T]): int {.inline, noSideEffect.} =
   grid.width
 
-proc flatHeight*[T](grid: FlatGrid[T]): int {.inline, noSideEffect.} =
+proc height*[T](grid: FlatGrid[T]): int {.inline, noSideEffect.} =
   grid.height
 
-proc flatInBounds*[T](grid: FlatGrid[T], pos: Coord): bool {.inline,
+proc inBounds*[T](grid: FlatGrid[T], pos: Coord): bool {.inline,
     noSideEffect.} =
   pos.r >= 0 and pos.r < grid.height and pos.c >= 0 and pos.c < grid.width
 
-proc flatGet*[T](grid: FlatGrid[T], pos: Coord, default: T): T =
-  if grid.flatInBounds(pos): grid.data[pos.r * grid.width + pos.c] else: default
+proc get*[T](grid: FlatGrid[T], pos: Coord, default: T): T =
+  if grid.inBounds(pos): grid.data[pos.r * grid.width + pos.c] else: default
 
 proc `[]`*[T](grid: FlatGrid[T], pos: Coord): T =
   grid.data[pos.r * grid.width + pos.c]
@@ -255,83 +253,182 @@ proc `[]`*[T](grid: FlatGrid[T], pos: Coord): T =
 proc `[]=`*[T](grid: var FlatGrid[T], pos: Coord, val: T) =
   grid.data[pos.r * grid.width + pos.c] = val
 
-proc flatNeighbors*[T](grid: FlatGrid[T], pos: Coord, diagonals = false): seq[Coord] =
-  ## Get valid neighbors of a position (flat grid version)
+proc neighbors*[T](grid: FlatGrid[T], pos: Coord, diagonals = false): seq[Coord] =
+  ## Get valid neighbors of a position
   let dirs = if diagonals: DIRECTIONS_8.toSeq else: DIRECTIONS_4.toSeq
   for dir in dirs:
     let newPos = pos + dir
-    if grid.flatInBounds(newPos):
+    if grid.inBounds(newPos):
       result.add(newPos)
 
-proc flatNeighborsWithValues*[T](grid: FlatGrid[T], pos: Coord,
+proc neighborsWithValues*[T](grid: FlatGrid[T], pos: Coord,
     diagonals = false): seq[(Coord, T)] =
-  ## Get valid neighbors with their values (flat grid version)
-  for neighbor in grid.flatNeighbors(pos, diagonals):
+  ## Get valid neighbors with their values
+  for neighbor in grid.neighbors(pos, diagonals):
     result.add((neighbor, grid[neighbor]))
 
 proc flatToGrid*[T](flat: FlatGrid[T]): Grid[T] =
   ## Convert flat grid to nested grid
-  var result = newSeq[seq[T]](flat.height)
+  var grid = newSeq[seq[T]](flat.height)
   for r in 0..<flat.height:
-    result[r] = newSeq[T](flat.width)
+    grid[r] = newSeq[T](flat.width)
     for c in 0..<flat.width:
-      result[r][c] = flat[(r, c)]
-  result
+      grid[r][c] = flat[(r, c)]
+  grid
 
 proc gridToFlat*[T](grid: Grid[T]): FlatGrid[T] =
   ## Convert nested grid to flat grid
-  let height = grid.height
-  let width = grid.width
-  var flat = newFlatGrid[T](width, height, grid[0][0]) # Use first element as default
-  for r in 0..<height:
-    for c in 0..<width:
+  let h = grid.height
+  let w = grid.width
+  var flat = newFlatGrid[T](w, h, grid[0][0])
+  for r in 0..<h:
+    for c in 0..<w:
       flat[(r, c)] = grid[(r, c)]
   flat
 
-proc parseCharGridFlat*(lines: seq[string]): FlatGrid[char] =
-  ## Parse lines to flat character grid
-  if lines.len == 0:
+proc parseCharGridFlat*(input: string): FlatGrid[char] =
+  ## Parse raw input string to flat character grid
+  ## Width = chars until first newline, height = total chars / width
+  if input.len == 0:
     return FlatGrid[char](data: @[], width: 0, height: 0)
 
-  let width = lines[0].len
-  let height = lines.len
-  var grid = newFlatGrid[char](width, height, ' ')
-  for r, line in lines:
-    for c, ch in line:
-      grid[(r, c)] = ch
-  grid
+  # Find width from first line
+  var width = 0
+  for c in input:
+    if c == '\n': break
+    inc width
 
-proc parseIntGridFlat*(lines: seq[string], sep = ""): FlatGrid[int] =
-  ## Parse lines to flat integer grid
-  if lines.len == 0:
+  # Build data, skipping newlines
+  var data: seq[char] = @[]
+  for c in input:
+    if c != '\n':
+      data.add(c)
+
+  let height = data.len div width
+  FlatGrid[char](data: data, width: width, height: height)
+
+proc parseIntGridFlat*(input: string): FlatGrid[int] =
+  ## Parse raw input string to flat integer grid (each char is a digit)
+  if input.len == 0:
     return FlatGrid[int](data: @[], width: 0, height: 0)
 
-  if sep == "":
-    let width = lines[0].len
-    let height = lines.len
-    var grid = newFlatGrid[int](width, height, 0)
-    for r, line in lines:
-      for c, ch in line:
-        grid[(r, c)] = int(ch) - int('0')
-    grid
-  else:
-    # For separated values, we need to determine width from first line
-    let tokens = lines[0].split(sep[0])
-    var width = 0
-    for token in tokens:
-      if token.len > 0:
-        width += 1
+  # Find width from first line
+  var width = 0
+  for c in input:
+    if c == '\n': break
+    inc width
 
-    let height = lines.len
-    var grid = newFlatGrid[int](width, height, 0)
-    for r, line in lines:
-      let rowTokens = line.split(sep[0])
-      var c = 0
-      for token in rowTokens:
-        if token.len > 0:
-          grid[(r, c)] = parseInt(token)
-          c += 1
-    grid
+  # Build data, skipping newlines
+  var data: seq[int] = @[]
+  for c in input:
+    if c != '\n':
+      data.add(int(c) - int('0'))
+
+  let height = data.len div width
+  FlatGrid[int](data: data, width: width, height: height)
+
+# ============================================================================
+# SPARSE GRID OPERATIONS (MEMORY-EFFICIENT FOR SPARSE DATA)
+# ============================================================================
+
+type
+  SparseGrid*[T] = object
+    data*: Table[Coord, T] # Only stores non-empty cells
+    width*: int
+    height*: int
+    empty*: T              # The value considered "empty" (not stored)
+
+proc newSparseGrid*[T](width, height: int, empty: T): SparseGrid[T] =
+  ## Create a sparse grid with dimensions and empty value
+  SparseGrid[T](
+    data: initTable[Coord, T](),
+    width: width,
+    height: height,
+    empty: empty
+  )
+
+proc width*[T](grid: SparseGrid[T]): int {.inline, noSideEffect.} =
+  grid.width
+
+proc height*[T](grid: SparseGrid[T]): int {.inline, noSideEffect.} =
+  grid.height
+
+proc inBounds*[T](grid: SparseGrid[T], pos: Coord): bool {.inline,
+    noSideEffect.} =
+  pos.r >= 0 and pos.r < grid.height and pos.c >= 0 and pos.c < grid.width
+
+proc get*[T](grid: SparseGrid[T], pos: Coord, default: T): T =
+  if not grid.inBounds(pos): return default
+  grid.data.getOrDefault(pos, grid.empty)
+
+proc `[]`*[T](grid: SparseGrid[T], pos: Coord): T =
+  grid.data.getOrDefault(pos, grid.empty)
+
+proc `[]=`*[T](grid: var SparseGrid[T], pos: Coord, val: T) =
+  if val == grid.empty:
+    grid.data.del(pos) # Remove if setting to empty
+  else:
+    grid.data[pos] = val
+
+proc neighbors*[T](grid: SparseGrid[T], pos: Coord, diagonals = false): seq[Coord] =
+  ## Get valid neighbors of a position
+  let dirs = if diagonals: DIRECTIONS_8.toSeq else: DIRECTIONS_4.toSeq
+  for dir in dirs:
+    let newPos = pos + dir
+    if grid.inBounds(newPos):
+      result.add(newPos)
+
+proc neighborsWithValues*[T](grid: SparseGrid[T], pos: Coord,
+    diagonals = false): seq[(Coord, T)] =
+  ## Get valid neighbors with their values
+  for neighbor in grid.neighbors(pos, diagonals):
+    result.add((neighbor, grid[neighbor]))
+
+proc parseSparseGrid*(input: string, empty: char = ' '): SparseGrid[char] =
+  ## Parse raw input string to sparse character grid
+  ## Only stores non-empty cells for memory efficiency
+  if input.len == 0:
+    return SparseGrid[char](data: initTable[Coord, char](), width: 0, height: 0, empty: empty)
+
+  # Find width from first line
+  var width = 0
+  for c in input:
+    if c == '\n': break
+    inc width
+
+  # Build sparse data, only storing non-empty cells
+  var data = initTable[Coord, char]()
+  var r = 0
+  var c = 0
+  for ch in input:
+    if ch == '\n':
+      inc r
+      c = 0
+    else:
+      if ch != empty:
+        data[(r, c)] = ch
+      inc c
+
+  let height = r + (if c > 0: 1 else: 0)
+  SparseGrid[char](data: data, width: width, height: height, empty: empty)
+
+proc sparseToGrid*[T](sparse: SparseGrid[T]): Grid[T] =
+  ## Convert sparse grid to nested grid
+  result = newSeqWith(sparse.height, newSeq[T](sparse.width).mapIt(sparse.empty))
+  for pos, val in sparse.data.pairs:
+    result[pos.r][pos.c] = val
+
+proc gridToSparse*[T](grid: Grid[T], empty: T): SparseGrid[T] =
+  ## Convert nested grid to sparse grid
+  result = newSparseGrid[T](grid.width, grid.height, empty)
+  for r in 0..<grid.height:
+    for c in 0..<grid.width:
+      if grid[r][c] != empty:
+        result.data[(r, c)] = grid[r][c]
+
+proc count*[T](grid: SparseGrid[T]): int {.inline.} =
+  ## Count of non-empty cells
+  grid.data.len
 
 # ============================================================================
 # ITERATORS

@@ -3,7 +3,6 @@
 
 import std/[strutils, os, algorithm]
 import ./grid # Import Coord3 type for 3D range operations
-import ./parsing
 
 # ============================================================================
 # INPUT/OUTPUT SECTION
@@ -200,21 +199,17 @@ import std/tables
 
 proc groupBy*[T, K](items: seq[T], keyFn: proc(x: T): K): Table[K, seq[T]] =
   ## Group items by key function
-  var result: Table[K, seq[T]]
   for item in items:
     let key = keyFn(item)
     if key notin result:
       result[key] = @[]
     result[key].add(item)
-  result
 
 proc countBy*[T, K](items: seq[T], keyFn: proc(x: T): K): Table[K, int] =
   ## Count items by key function
-  var table: Table[K, int]
   for item in items:
     let key = keyFn(item)
-    table[key] = table.getOrDefault(key, 0) + 1
-  result = table
+    result[key] = result.getOrDefault(key, 0) + 1
 
 proc mostCommon*[T](items: seq[T]): T =
   ## Find most common element

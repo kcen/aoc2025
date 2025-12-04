@@ -15,15 +15,15 @@ suite "Memoization Functionality":
     var cache: Table[int, int] = initTable[int, int]()
     cache[0] = 0
     cache[1] = 1
-
+    
     proc fibonacciMemoized(n: int): int =
       if cache.hasKey(n):
         cache[n]
       else:
-        let computedValue = fibonacciMemoized(n-1) + fibonacciMemoized(n-2)
-        cache[n] = computedValue
-        computedValue
-
+        let value = fibonacciMemoized(n-1) + fibonacciMemoized(n-2)
+        cache[n] = value
+        value
+    
     check fibonacciMemoized(0) == 0
     check fibonacciMemoized(1) == 1
     check fibonacciMemoized(5) == 5
@@ -32,16 +32,16 @@ suite "Memoization Functionality":
   test "memoized GCD works correctly":
     # Test two-argument memoization
     var cache: Table[(int, int), int] = initTable[(int, int), int]()
-
+    
     proc gcdMemoized(a, b: int): int =
       let key = (a, b)
       if cache.hasKey(key):
         cache[key]
       else:
-        let computedValue = if b == 0: abs(a) else: gcdMemoized(b, a mod b)
-        cache[key] = computedValue
-        computedValue
-
+        let value = if b == 0: abs(a) else: gcdMemoized(b, a mod b)
+        cache[key] = value
+        value
+    
     check gcdMemoized(48, 18) == 6
     check gcdMemoized(17, 19) == 1
     check gcdMemoized(100, 50) == 50
@@ -51,15 +51,15 @@ suite "Memoization Functionality":
     var testCache: Table[int, int] = initTable[int, int]()
     testCache[0] = 0
     testCache[1] = 1
-
+    
     proc testMemoized(n: int): int =
       if testCache.hasKey(n):
         testCache[n]
       else:
-        let computedValue = testMemoized(n-1) + testMemoized(n-2)
-        testCache[n] = computedValue
-        computedValue
-
+        let value = testMemoized(n-1) + testMemoized(n-2)
+        testCache[n] = value
+        value
+    
     discard testMemoized(5) # Should compute and cache values
     
     # Check that cache was populated
@@ -69,7 +69,7 @@ suite "Memoization Functionality":
     check testCache.hasKey(3)
     check testCache.hasKey(4)
     check testCache.hasKey(5)
-
+    
     # Check cache values are correct
     check testCache[0] == 0
     check testCache[1] == 1
@@ -82,20 +82,20 @@ suite "Memoization Functionality":
     # Test that memoization prevents duplicate calculations
     var callCount = 0
     var testCache: Table[int, int] = initTable[int, int]()
-
+    
     proc countingFib(n: int): int =
       callCount.inc()
       if testCache.hasKey(n):
         testCache[n]
       else:
-        let computedValue = if n <= 1: n else: countingFib(n-1) + countingFib(n-2)
-        testCache[n] = computedValue
-        computedValue
-
+        let value = if n <= 1: n else: countingFib(n-1) + countingFib(n-2)
+        testCache[n] = value
+        value
+    
     callCount = 0
     discard countingFib(5)
     let callsWithMemo = callCount
-
+    
     # Should have made some calls but fewer than naive recursion
     check callsWithMemo > 0
 
@@ -106,24 +106,24 @@ suite "Memoization Functionality":
 suite "Performance Comparison":
   test "memoization provides correct results vs naive approach":
     # Test that memoization gives same results as naive approach
-
+    
     # Without memoization
     proc fibonacciNaive(n: int): int =
       if n <= 1: n else: fibonacciNaive(n-1) + fibonacciNaive(n-2)
-
+    
     # With memoization
     var fibCache: Table[int, int] = initTable[int, int]()
     fibCache[0] = 0
     fibCache[1] = 1
-
+    
     proc fibonacciMemoized(n: int): int =
       if fibCache.hasKey(n):
         fibCache[n]
       else:
-        let computedValue = fibonacciMemoized(n-1) + fibonacciMemoized(n-2)
-        fibCache[n] = computedValue
-        computedValue
-
+        let value = fibonacciMemoized(n-1) + fibonacciMemoized(n-2)
+        fibCache[n] = value
+        value
+    
     # Test that both versions give same result
     check fibonacciNaive(10) == 55
     check fibonacciMemoized(10) == 55
@@ -138,13 +138,13 @@ suite "Combinatorial Memoization Integration":
   test "combinationsMemoized returns correct values":
     # Test the combinationsMemoized function from combinatorics
     var memo = initTable[(int, int), int]()
-
+    
     # Test small cases where we know the expected results
-    let computedValue1 = combinationsMemoized(@[1, 2, 3], 2, memo)
-    check computedValue1 == 3 # C(3,2) = 3
-
-    let computedValue2 = combinationsMemoized(@[1, 2, 3, 4], 3, memo)
-    check computedValue2 == 4 # C(4,3) = 4
+    let result1 = combinationsMemoized(@[1, 2, 3], 2, memo)
+    check result1 == 3 # C(3,2) = 3
+    
+    let result2 = combinationsMemoized(@[1, 2, 3, 4], 3, memo)
+    check result2 == 4 # C(4,3) = 4
     
     # Check that memo table was populated
     check memo.len > 0
@@ -153,17 +153,17 @@ suite "Combinatorial Memoization Integration":
     # Test that the memoization table grows as expected
     var memo = initTable[(int, int), int]()
     let initialSize = memo.len
-
+    
     discard combinationsMemoized(@[1, 2, 3, 4, 5], 2, memo)
     let sizeAfterFirst = memo.len
-
+    
     discard combinationsMemoized(@[1, 2, 3, 4, 5, 6], 3, memo)
     let sizeAfterSecond = memo.len
-
+    
     check sizeAfterFirst > initialSize
     check sizeAfterSecond > sizeAfterFirst
 
   test "basic math utilities still work":
     # Test that basic utilities still work after adding memoization
-    let computedValue = digitSum(123) # Should be 6
-    check computedValue == 6
+    let value = digitSum(123) # Should be 6
+    check value == 6

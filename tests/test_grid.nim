@@ -5,7 +5,7 @@ import unittest
 import ../aoc/aoc_utils
 import ../aoc/utils/grid
 
-suite "Coordinate Types":
+suite "Grid Tests":
   test "Coord type: basic creation":
     let pos: Coord = (5, 3)
     check pos.r == 5
@@ -14,33 +14,32 @@ suite "Coordinate Types":
   test "Coord addition":
     let p1: Coord = (5, 3)
     let p2: Coord = (2, 1)
-    let result = p1 + p2
-    check result == (7, 4)
+    let value = p1 + p2
+    check value == (7, 4)
 
   test "Coord subtraction":
     let p1: Coord = (10, 8)
     let p2: Coord = (3, 2)
-    let result = p1 - p2
-    check result == (7, 6)
+    let value = p1 - p2
+    check value == (7, 6)
 
   test "Coord scalar multiplication":
     let p: Coord = (2, 3)
-    let result = p * 4
-    check result == (8, 12)
+    let value = p * 4
+    check value == (8, 12)
 
   test "manhattanDistance: 2D":
     let p1: Coord = (0, 0)
     let p2: Coord = (3, 4)
-    let result = manhattanDistance(p1, p2)
-    check result == 7 # |3-0| + |4-0|
+    let value = manhattanDistance(p1, p2)
+    check value == 7 # |3-0| + |4-0|
 
   test "manhattanDistance: 3D":
     let p1: Coord3 = (0, 0, 0)
     let p2: Coord3 = (1, 2, 3)
-    let result = manhattanDistance(p1, p2)
-    check result == 6 # |1| + |2| + |3|
+    let value = manhattanDistance(p1, p2)
+    check value == 6 # |1| + |2| + |3|
 
-suite "Grid Operations":
   test "Grid creation and access":
     let grid = newGrid(3, 3, 0)
     check grid.height == 3
@@ -156,41 +155,41 @@ suite "Grid Operations":
     check grid[(0, 0)] == 5
     check grid[(1, 1)] == 10
 
-  test "flatInBounds: check boundaries":
+  test "FlatGrid inBounds: check boundaries":
     let grid = newFlatGrid[int](3, 3, 0)
-    check grid.flatInBounds((0, 0)) == true
-    check grid.flatInBounds((2, 2)) == true
-    check grid.flatInBounds((3, 3)) == false
-    check grid.flatInBounds((-1, 0)) == false
+    check grid.inBounds((0, 0)) == true
+    check grid.inBounds((2, 2)) == true
+    check grid.inBounds((3, 3)) == false
+    check grid.inBounds((-1, 0)) == false
 
-  test "flatNeighbors: 4-connectivity":
+  test "FlatGrid neighbors: 4-connectivity":
     let grid = newFlatGrid[int](5, 5, 0)
-    let neighbors = grid.flatNeighbors((2, 2), diagonals = false)
+    let neighbors = grid.neighbors((2, 2), diagonals = false)
     check neighbors.len == 4
     check (1, 2) in neighbors
     check (3, 2) in neighbors
     check (2, 1) in neighbors
     check (2, 3) in neighbors
 
-  test "flatNeighbors: 8-connectivity":
+  test "FlatGrid neighbors: 8-connectivity":
     let grid = newFlatGrid[int](5, 5, 0)
-    let neighbors = grid.flatNeighbors((2, 2), diagonals = true)
+    let neighbors = grid.neighbors((2, 2), diagonals = true)
     check neighbors.len == 8
     check (1, 1) in neighbors
     check (1, 2) in neighbors
     check (1, 3) in neighbors
 
   test "parseCharGridFlat: create flat character grid":
-    let lines = @["ABC", "DEF", "GHI"]
-    let grid = parseCharGridFlat(lines)
+    let input = "ABC\nDEF\nGHI"
+    let grid = parseCharGridFlat(input)
     check grid.height == 3
     check grid.width == 3
     check grid[(0, 0)] == 'A'
     check grid[(2, 2)] == 'I'
 
   test "parseIntGridFlat: create flat integer grid":
-    let lines = @["123", "456"]
-    let grid = parseIntGridFlat(lines, "")
+    let input = "123\n456"
+    let grid = parseIntGridFlat(input)
     check grid.height == 2
     check grid.width == 3
     check grid[(0, 0)] == 1
@@ -205,7 +204,63 @@ suite "Grid Operations":
     check converted[0][0] == original[0][0]
     check converted[1][1] == original[1][1]
 
-suite "Cache-Friendly Operations":
+# ============================================================================
+# SPARSE GRID TESTS
+# ============================================================================
+  test "newSparseGrid: create sparse grid":
+    let grid = newSparseGrid[char](3, 3, '.')
+    check grid.width == 3
+    check grid.height == 3
+    check grid.count == 0
+
+  test "SparseGrid access: get and set values":
+    var grid = newSparseGrid[char](3, 3, '.')
+    grid[(0, 0)] = '@'
+    grid[(1, 1)] = '#'
+    check grid[(0, 0)] == '@'
+    check grid[(1, 1)] == '#'
+    check grid[(2, 2)] == '.' # empty
+    check grid.count == 2
+
+  test "SparseGrid: setting to empty removes":
+    var grid = newSparseGrid[char](3, 3, '.')
+    grid[(0, 0)] = '@'
+    check grid.count == 1
+    grid[(0, 0)] = '.' # Set to empty
+    check grid.count == 0
+    check grid[(0, 0)] == '.'
+
+  test "SparseGrid inBounds: check boundaries":
+    let grid = newSparseGrid[char](3, 3, '.')
+    check grid.inBounds((0, 0)) == true
+    check grid.inBounds((2, 2)) == true
+    check grid.inBounds((3, 3)) == false
+    check grid.inBounds((-1, 0)) == false
+
+  test "SparseGrid neighbors: 8-connectivity":
+    var grid = newSparseGrid[char](5, 5, '.')
+    let neighbors = grid.neighbors((2, 2), diagonals = true)
+    check neighbors.len == 8
+
+  test "parseSparseGrid: create sparse character grid":
+    let input = "..X\n.y.\nZ.."
+    let grid = parseSparseGrid(input, '.')
+    check grid.height == 3
+    check grid.width == 3
+    check grid.count == 3
+    check grid[(0, 2)] == 'X'
+    check grid[(1, 1)] == 'y'
+    check grid[(2, 0)] == 'Z'
+    check grid[(0, 0)] == '.'
+
+  test "sparseToGrid and gridToSparse: conversion round-trip":
+    let original = parseCharGrid(@["@..", ".@.", "..@"])
+    let sparse = gridToSparse(original, '.')
+    check sparse.count == 3
+    let converted = sparseToGrid(sparse)
+    check converted[0][0] == original[0][0]
+    check converted[1][1] == original[1][1]
+
   test "linearIndex: convert 2D to 1D":
     let pos: Coord = (2, 3)
     let idx = linearIndex(pos, 4) # width = 4

@@ -1,7 +1,5 @@
 # Combinatorics Utilities for AOC
 # Combinations, permutations, and mathematical combinatorics
-
-import std/sequtils
 import ./math
 
 # ============================================================================

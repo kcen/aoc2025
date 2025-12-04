@@ -71,5 +71,3 @@ suite "Digit Operations":
 
 # Note: Factorial tests are now in test_combinatorics.nim
 # since factorial functions were moved to combinatorics module for better organization
-
-echo "Math utility tests completed!"

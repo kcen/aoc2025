@@ -27,7 +27,11 @@ from utils/grid import
       transpose,
   parseCharGrid, parseIntGrid,
   linearIndex, coordFromIndex, gridToLinear, linearToGrid,
-  gridPositions, gridItems, mutableGridItems
+  gridPositions, gridItems, mutableGridItems,
+  FlatGrid, newFlatGrid, flatToGrid, gridToFlat,
+  parseCharGridFlat, parseIntGridFlat,
+  SparseGrid, newSparseGrid, sparseToGrid, gridToSparse,
+  parseSparseGrid, count
 
 # Mathematical utilities (no factorial functions - they are in combinatorics)
 from utils/math import
@@ -102,6 +106,10 @@ export
   parseCharGrid, parseIntGrid,
   linearIndex, coordFromIndex, gridToLinear, linearToGrid,
   gridPositions, gridItems, mutableGridItems,
+  FlatGrid, newFlatGrid, flatToGrid, gridToFlat,
+  parseCharGridFlat, parseIntGridFlat,
+  SparseGrid, newSparseGrid, sparseToGrid, gridToSparse,
+  parseSparseGrid, count,
 
   # Math (factorial functions are in combinatorics)
   gcd, lcm, gcdSeq, lcmSeq, gcdBinary,

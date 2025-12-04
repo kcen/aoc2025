@@ -69,5 +69,3 @@ suite "Grouping and Counting":
     let items = @[1, 2, 2, 3, 3, 3, 4]
     let common = mostCommon(items)
     check common == 3
-
-echo "Core utility tests completed!"

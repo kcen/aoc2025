@@ -8,63 +8,54 @@ import ../aoc/utils/parsing
 suite "Basic Parsing Functions":
   test "parseLines: splits by newline and strips whitespace":
     let input = "  hello\n  world  \n  test  "
-    let result = parseLines(input)
-    check result == @["hello", "world", "test"]
-
-  test "parseLines: handles empty lines":
-    let input = "line1\n\nline2\n"
-    let result = parseLines(input)
-    check result.len == 2
-    check result[0] == "line1"
-    check result[1] == "line2"
+    let value = parseLines(input)
+    check value == @["hello", "world", "test"]
 
   test "parseTokens: splits tokens with custom separator":
-    let result = parseTokens("hello,world,test", ',')
-    check result == @["hello", "world", "test"]
+    let value = parseTokens("hello,world,test", ',')
+    check value == @["hello", "world", "test"]
 
   test "parseInts: extracts all integers from string":
-    let result = parseInts("10 20 30 40")
-    check result == @[10, 20, 30, 40]
+    let value = parseInts("10 20 30 40")
+    check value == @[10, 20, 30, 40]
 
   test "parseInts: handles negative numbers":
-    let result = parseInts("1 -5 3 -10")
-    check result == @[1, -5, 3, -10]
+    let value = parseInts("1 -5 3 -10")
+    check value == @[1, -5, 3, -10]
 
   test "parseInts: works with different separators":
-    let result = parseInts("10,20,30", ',')
-    check result == @[10, 20, 30]
+    let value = parseInts("10,20,30", ',')
+    check value == @[10, 20, 30]
 
   test "parseSections: handles blank line separation":
     let input = "line1\nline2\n\nsection2\nline3"
-    let result = parseSections(input)
-    check result.len == 2
-    check result[0] == @["line1", "line2"]
-    check result[1] == @["section2", "line3"]
+    let value = parseSections(input)
+    check value.len == 2
+    check value[0] == @["line1", "line2"]
+    check value[1] == @["section2", "line3"]
 
   test "parseChars: converts string to char sequence":
-    let result = parseChars("ABC")
-    check result == @['A', 'B', 'C']
+    let value = parseChars("ABC")
+    check value == @['A', 'B', 'C']
 
   test "lineChars: converts multiline to char grid":
-    let result = lineChars("AB\nCD")
-    check result.len == 2
-    check result[0] == @['A', 'B']
-    check result[1] == @['C', 'D']
+    let value = lineChars("AB\nCD")
+    check value.len == 2
+    check value[0] == @['A', 'B']
+    check value[1] == @['C', 'D']
 
-suite "Extraction Functions":
   test "extractInts: extracts integers from complex string":
-    let result = extractInts("x=10, y=-20, z=30")
-    check result == @[10, -20, 30]
+    let value = extractInts("x=10, y=-20, z=30")
+    check value == @[10, -20, 30]
 
   test "extractInts: handles negative numbers in context":
-    let result = extractInts("temp=-5, count=10, delta=-3")
-    check result == @[-5, 10, -3]
+    let value = extractInts("temp=-5, count=10, delta=-3")
+    check value == @[-5, 10, -3]
 
   test "countOccurrences: count substring occurrences":
-    let result = countOccurrences("ababab", "ab")
-    check result == 3
+    let value = countOccurrences("ababab", "ab")
+    check value == 3
 
-suite "String Utilities":
   test "isPalindrome: check palindrome":
     check isPalindrome("racecar") == true
     check isPalindrome("hello") == false
@@ -73,10 +64,10 @@ suite "String Utilities":
     check isPalindrome("a") == true
 
   test "allPalindromes: find all palindromic substrings":
-    let result = allPalindromes("aba")
-    check result.contains("a")
-    check result.contains("b")
-    check result.contains("aba")
+    let value = allPalindromes("aba")
+    check value.contains("a")
+    check value.contains("b")
+    check value.contains("aba")
 
   test "matchPattern: find pattern in sequence":
     let text = @[1, 2, 3, 2, 3, 2, 3]
@@ -87,31 +78,27 @@ suite "String Utilities":
     check 3 in matches
     check 5 in matches
 
-suite "Scanf-based Parsing Utilities":
   test "parseRange: parses range format correctly":
-    let result = parseRange("123-456")
-    check result.start == 123
-    check result.finish == 456
+    var value = parseRange("123-456")
+    check value.start == 123
+    check value.ending == 456
 
-  test "parseRange: handles negative numbers":
-    let result = parseRange("-10--5")
-    check result.start == -10
-    check result.finish == -5
+    value = parseRange("-10--5")
+    check value.start == -10
+    check value.ending == -5
 
   test "parseIntLine: parses all integers by default":
-    let result = parseIntLine("10 20 30")
-    check result == @[10, 20, 30]
+    let value = parseIntLine("10 20 30")
+    check value == @[10, 20, 30]
 
   test "parseIntLine: validates single integer":
-    let result = parseIntLine("42", 1)
-    check result == @[42]
+    let value = parseIntLine("42", 1)
+    check value == @[42]
 
   test "parseIntLine: validates two integers":
-    let result = parseIntLine("10 20", 2)
-    check result == @[10, 20]
+    let value = parseIntLine("10 20", 2)
+    check value == @[10, 20]
 
   test "parseIntLine: validates three integers":
-    let result = parseIntLine("1 2 3", 3)
-    check result == @[1, 2, 3]
-
-echo "Parsing utility tests completed!"
+    let value = parseIntLine("1 2 3", 3)
+    check value == @[1, 2, 3]

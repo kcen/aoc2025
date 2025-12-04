@@ -70,8 +70,6 @@ suite "Precomputed Factorials (High-Performance)":
 suite "Memoization Support":
   test "combinationsMemoized: memoized combination count":
     var memo = initTable[(int, int), int]()
-    let result = combinationsMemoized(@[1, 2, 3, 4, 5], 3, memo)
-    check result == 10 # C(5,3) = 10
+    let value = combinationsMemoized(@[1, 2, 3, 4, 5], 3, memo)
+    check value == 10 # C(5,3) = 10
     check memo.len > 0 # Cache should be populated
-
-echo "Combinatorics utility tests completed!"

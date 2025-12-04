@@ -1,5 +1,5 @@
 import aoc_utils
-import std/[sets]
+import std/sets, std/strutils
 
 #maximum number of digits a range value can have (base 10)
 const MaxDigits = 16
@@ -26,9 +26,8 @@ proc day_02*(): Solution =
   var part_two = 0
   var seen: HashSet[int]
 
-  for r_str in getInput().parseTokens(','):
-    let parts = r_str.parseInts('-')
-    let r: Range = (parts[0], parts[1])
+  for r_str in getInput().split(','):
+    let r = r_str.parseRange()
     let minDigits = digitCount(r.start)
     let maxDigits = digitCount(r.ending)
 

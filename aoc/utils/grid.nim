@@ -375,7 +375,7 @@ proc neighbors*[T](grid: SparseGrid[T], pos: Coord, diagonals = false): seq[Coor
   let dirs = if diagonals: DIRECTIONS_8.toSeq else: DIRECTIONS_4.toSeq
   for dir in dirs:
     let newPos = pos + dir
-    if grid.inBounds(newPos):
+    if grid.inBounds(newPos) and grid.data.hasKey(newPos):
       result.add(newPos)
 
 proc neighborsWithValues*[T](grid: SparseGrid[T], pos: Coord,

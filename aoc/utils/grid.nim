@@ -372,11 +372,17 @@ proc `[]=`*[T](grid: var SparseGrid[T], pos: Coord, val: T) =
 
 proc neighbors*[T](grid: SparseGrid[T], pos: Coord, diagonals = false): seq[Coord] =
   ## Get valid neighbors of a position
-  let dirs = if diagonals: DIRECTIONS_8.toSeq else: DIRECTIONS_4.toSeq
-  for dir in dirs:
-    let newPos = pos + dir
-    if grid.inBounds(newPos) and grid.data.hasKey(newPos):
-      result.add(newPos)
+  result = newSeqOfCap[Coord](if diagonals: 8 else: 4)
+  if diagonals:
+    for dir in DIRECTIONS_8:
+      let newPos = pos + dir
+      if grid.inBounds(newPos) and grid.data.hasKey(newPos):
+        result.add(newPos)
+  else:
+    for dir in DIRECTIONS_4:
+      let newPos = pos + dir
+      if grid.inBounds(newPos) and grid.data.hasKey(newPos):
+        result.add(newPos)
 
 proc neighborsWithValues*[T](grid: SparseGrid[T], pos: Coord,
     diagonals = false): seq[(Coord, T)] =

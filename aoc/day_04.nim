@@ -1,13 +1,18 @@
-import std/tables
 import aoc_utils
 
 proc day_04*(): Solution =
-  var grid = getInput().parseSparseGrid('.')
-  var counts = initTable[Coord, int]()
+  var grid = getInput().parseCharGridFlat()
+  var counts = newFlatGrid[int](grid.width, grid.height, 0)
 
   # keep track of how many neighbors
-  for pos, _ in grid.data.pairs:
-    counts[pos] = grid.neighbors(pos, diagonals = true).len
+  for r in 0..<grid.height:
+    for c in 0..<grid.width:
+      let pos: Coord = (r, c)
+      if grid[pos] != '.':
+        for dir in DIRECTIONS_8:
+          let neighbor = (pos.r + dir.r, pos.c + dir.c)
+          if grid.inBounds(neighbor) and grid[neighbor] != '.':
+            counts[pos] = counts[pos] + 1
 
   var first_accessible = 0
   var total = 0
@@ -16,9 +21,11 @@ proc day_04*(): Solution =
   while true:
     var accessible: seq[Coord] = @[]
 
-    for pos, _ in grid.data.pairs:
-      if counts[pos] < 4:
-        accessible.add(pos)
+    for r in 0..<grid.height:
+      for c in 0..<grid.width:
+        let pos = (r, c)
+        if grid[pos] != '.' and counts[pos] < 4:
+          accessible.add(pos)
 
     if accessible.len == 0: break # quittin' time
 
@@ -29,10 +36,10 @@ proc day_04*(): Solution =
     total += accessible.len
 
     for pos in accessible:
-      for neighbor in grid.neighbors(pos, diagonals = true):
-        if counts.hasKey(neighbor):
-          counts[neighbor] -= 1
-      grid.data.del(pos)
-      counts.del(pos)
+      for dir in DIRECTIONS_8:
+        let neighbor = (pos.r + dir.r, pos.c + dir.c)
+        if grid.inBounds(neighbor) and grid[neighbor] != '.':
+          counts[neighbor] = counts[neighbor] - 1
+      grid[pos] = '.'
 
   Solution(part_one: $first_accessible, part_two: $total)

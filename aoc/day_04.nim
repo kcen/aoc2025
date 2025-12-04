@@ -1,45 +1,47 @@
 import aoc_utils
+import std/deques
+
+const EMPTY = '.'
+
+proc neighbors_count(grid: FlatGrid[char], pos: Coord): int =
+  for dir in DIRECTIONS_8:
+    let neighbor = pos + dir
+    if grid.inBounds(neighbor) and grid[neighbor] != EMPTY:
+      inc result
+
+proc enqueue_next(q: var Deque[Coord], grid: FlatGrid[char], pos: Coord) =
+  for dir in DIRECTIONS_8:
+    let neighbor = pos + dir
+    if grid.inBounds(neighbor) and grid[neighbor] != EMPTY:
+      q.addLast(neighbor)
 
 proc day_04*(): Solution =
   var grid = getInput().parseCharGridFlat()
-  var counts = newFlatGrid[int](grid.width, grid.height, 0)
+  var total = 0
+  var q = initDeque[Coord]()
 
-  # keep track of how many neighbors
+  var first_accessible = 0
   for r in 0..<grid.height:
     for c in 0..<grid.width:
       let pos: Coord = (r, c)
-      if grid[pos] != '.':
-        for dir in DIRECTIONS_8:
-          let neighbor = (pos.r + dir.r, pos.c + dir.c)
-          if grid.inBounds(neighbor) and grid[neighbor] != '.':
-            counts[pos] = counts[pos] + 1
+      if grid[pos] != EMPTY:
+        q.addLast(pos)
+        let count = grid.neighbors_count(pos)
+        if count < 4:
+          first_accessible += 1
 
-  var first_accessible = 0
-  var total = 0
-  var first_look = true
+  while q.len > 0:
+    let coord = q.popFirst()
 
-  while true:
-    var accessible: seq[Coord] = @[]
+    if grid[coord] == EMPTY:
+      continue
 
-    for r in 0..<grid.height:
-      for c in 0..<grid.width:
-        let pos = (r, c)
-        if grid[pos] != '.' and counts[pos] < 4:
-          accessible.add(pos)
+    let count = grid.neighbors_count(coord)
 
-    if accessible.len == 0: break # quittin' time
+    if count < 4:
+      q.enqueue_next(grid, coord)
 
-    if first_look:
-      first_accessible = accessible.len
-      first_look = false
-
-    total += accessible.len
-
-    for pos in accessible:
-      for dir in DIRECTIONS_8:
-        let neighbor = (pos.r + dir.r, pos.c + dir.c)
-        if grid.inBounds(neighbor) and grid[neighbor] != '.':
-          counts[neighbor] = counts[neighbor] - 1
-      grid[pos] = '.'
+      grid[coord] = EMPTY
+      total += 1
 
   Solution(part_one: $first_accessible, part_two: $total)

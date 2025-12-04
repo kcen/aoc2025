@@ -97,7 +97,7 @@ export
   # Grid
   Coord, Coord3, Direction, Direction3,
   DIRECTIONS_4, DIRECTIONS_8, DIRECTIONS_6_3D,
-  manhattanDistance,
+  `+`, `-`, `*`, manhattanDistance,
   Grid, newGrid, width, height, inBounds, get, `[]`, `[]=`,
   neighbors, neighborsWithValues,
   mapGrid, filterGrid, findFirst, findAll,

@@ -9,41 +9,38 @@ import std/strutils, std/sequtils, std/strscans
 
 proc parseLines*(s: string): seq[string] =
   ## Split string into non-empty lines
-  result = @[]
   let lines = s.split('\n')
-  for line in lines:
-    if line.len > 0:
-      result.add(line.strip())
+  result = newSeq[string](lines.len)
+  for idx, line in lines:
+    result[idx] = line.strip()
 
 proc parseSections*(s: string, sep = ""): seq[seq[string]] =
   ## Split string into sections separated by blank lines
   result = @[]
   let separator = if sep == "": "\n\n" else: sep
   let parts = s.strip.split(separator)
-  for part in parts:
-    if part.len > 0:
-      result.add(parseLines(part))
+  result = newSeq[seq[string]](parts.len)
+  for idx, part in parts:
+    result[idx] = parseLines(part)
 
 proc parseTokens*(line: string, sep = ' '): seq[string] =
-  ## Split line into non-empty tokens
-  result = @[]
-  let tokens = line.split(sep)
-  for token in tokens:
-    if token.len > 0:
-      result.add(token)
+  ## Split a string by a separator
+  line.split(sep)
 
 proc parseInts*(line: string, sep = ' '): seq[int] =
-  ## Parse line into sequence of integers
-  ## Fast implementation using split and parseInt
-  result = @[]
+  ## Parse string into sequence of integers split by separator
   let tokens = line.split(sep)
-  for token in tokens:
-    if token.len > 0:
-      result.add(parseInt(token))
+  result = newSeq[int](tokens.len)
+  for idx, token in tokens:
+    result[idx] = parseInt(token)
 
 proc lineChars*(s: string): seq[seq[char]] =
-  ## Split string into lines of characters
-  s.split('\n').mapIt(it.toSeq)
+  ## Split a string into lines of chars
+  result = @[]
+  let lines = s.split('\n')
+  result = newSeq[seq[char]](lines.len)
+  for idx, line in lines:
+    result[idx] = line.toSeq
 
 proc parseChars*(line: string): seq[char] =
   ## Convert string to sequence of characters

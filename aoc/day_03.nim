@@ -2,7 +2,7 @@ import aoc_utils
 import std/parseutils
 
 proc max_joltage(battery_chars: seq[char], on_size: int): int =
-  var joltage: seq[char] = @[]
+  var joltage: seq[char] = newSeq[char](on_size)
   var min_index = 0
 
   let size_max = battery_chars.len - 1
@@ -18,7 +18,7 @@ proc max_joltage(battery_chars: seq[char], on_size: int): int =
         largest = battery_chars[i]
         index_pos = i
     min_index = index_pos + 1
-    joltage.add(largest)
+    joltage[digit_pos] = largest
   discard joltage.parseInt(result)
 
 proc day_03*(): Solution =

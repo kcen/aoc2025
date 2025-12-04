@@ -239,8 +239,10 @@ suite "Grid Tests":
 
   test "SparseGrid neighbors: 8-connectivity":
     var grid = newSparseGrid[char](5, 5, '.')
+    grid[(2, 3)] = 'X'
+    grid[(1, 3)] = 'B'
     let neighbors = grid.neighbors((2, 2), diagonals = true)
-    check neighbors.len == 8
+    check neighbors.len == 2
 
   test "parseSparseGrid: create sparse character grid":
     let input = "..X\n.y.\nZ.."

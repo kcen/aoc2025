@@ -1,7 +1,7 @@
 # Grid Operations and Coordinate Types for AOC
 # 2D/3D coordinate handling, grid manipulation, and spatial algorithms
 
-import std/[sequtils, algorithm, strutils, tables]
+import std/[sequtils, algorithm, strutils, tables, math]
 
 # ============================================================================
 # COORDINATE TYPES
@@ -199,7 +199,7 @@ proc linearIndex*(pos: Coord, width: int): int {.inline, noSideEffect.} =
 
 proc coordFromIndex*(idx: int, width: int): Coord {.inline, noSideEffect.} =
   ## Convert linear index back to 2D coordinate
-  (idx div width, idx mod width)
+  idx.divMod(width)
 
 proc gridToLinear*[T](grid: Grid[T]): seq[T] =
   ## Flatten grid for better cache locality in sequential access
@@ -229,7 +229,7 @@ proc linearToGrid*[T](arr: seq[T], width: int): Grid[T] =
 proc newFlatGrid*[T](width, height: int, default: T): FlatGrid[T] =
   ## Create a flat grid with dimensions and default value
   FlatGrid[T](
-    data: newSeq[T](width * height).mapIt(default),
+    data: newSeq[T](width * height),
     width: width,
     height: height
   )

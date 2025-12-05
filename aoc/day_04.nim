@@ -21,26 +21,22 @@ proc day_04*(): Solution =
   var q = initDeque[Coord]()
 
   var first_accessible = 0
-  for r in 0..<grid.height:
-    for c in 0..<grid.width:
-      let pos: Coord = (r, c)
-      if grid[pos] != EMPTY:
-        q.addLast(pos)
-        let count = grid.neighbors_count(pos)
-        if count < 4:
-          first_accessible += 1
+
+  for idx, val in grid.data:
+    let pos: Coord = idx.coordFromIndex(grid.width)
+    if grid[pos] != EMPTY:
+      q.addLast(pos)
+      if grid.neighbors_count(pos) < 4:
+        first_accessible += 1
 
   while q.len > 0:
     let coord = q.popFirst()
-
-    if grid[coord] == EMPTY:
-      continue
+    if grid[coord] == EMPTY: continue
 
     let count = grid.neighbors_count(coord)
 
     if count < 4:
       q.enqueue_next(grid, coord)
-
       grid[coord] = EMPTY
       total += 1
 

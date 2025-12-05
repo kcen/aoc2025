@@ -1,4 +1,4 @@
-import aoc/[aoc_utils, day_00, day_01, day_02, day_03, day_04]
+import aoc/[aoc_utils, day_00, day_01, day_02, day_03, day_04, day_05]
 when compileOption("profiler"):
   import nimprof
 
@@ -13,5 +13,7 @@ case getDay():
     printSolution day_03()
   of 4:
     printSolution day_04()
+  of 5:
+    printSolution day_05()
   else:
     notImplemented()

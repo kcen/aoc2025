@@ -2,7 +2,7 @@ import aoc_utils
 import std/sequtils, std/strutils, std/math
 
 proc day_06*(): Solution =
-  var lines = getInput(false).split('\n')
+  var lines = getInput(false).split('\n').filterIt(not it.isEmptyOrWhitespace)
   let operators_line = lines.pop
   let numerators = lines.mapIt(it.parseInts)
   let rows = lines.mapIt(it.toSeq)

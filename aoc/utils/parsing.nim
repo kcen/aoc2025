@@ -29,7 +29,7 @@ proc parseTokens*(line: string, sep = ' '): seq[string] =
 
 proc parseInts*(line: string, sep = ' '): seq[int] =
   ## Parse string into sequence of integers split by separator
-  let tokens = line.split(sep)
+  let tokens = line.split(sep).filterIt(not it.isEmptyOrWhitespace)
   result = newSeq[int](tokens.len)
   for idx, token in tokens:
     result[idx] = parseInt(token)

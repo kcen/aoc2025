@@ -8,11 +8,14 @@ import ./grid # Import Coord3 type for 3D range operations
 # INPUT/OUTPUT SECTION
 # ============================================================================
 
-proc getInput*(): string =
+proc getInput*(strip = true): string =
   ## Get input for current day, with fallback to test file
   let filename = getEnv("AOC_INPUT", "inputs/hello_world")
   if fileExists(filename):
-    return strip(readFile(filename))
+    if strip:
+      return strip(readFile(filename))
+    else:
+      return readFile(filename)
   echo "Input file not found"
   quit(QuitFailure)
 

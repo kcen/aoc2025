@@ -18,7 +18,7 @@ proc day_06*(): Solution =
 
   var pt2 = 0
   var current_nums: seq[int] = @[]
-  for idx in countdown(operators_line.high, 0):
+  for idx in countdown(lines[0].high, 0):
     let col_str = rows.mapIt($it[idx]).join("").strip
     if col_str != "":
       current_nums.add(col_str.parseInt)

@@ -29,7 +29,7 @@ solve DAY:
 
 # Profile a specific day (enables profiler)
 profile DAY INPUT:
-  AOC_DAY={{DAY}} AOC_INPUT={{INPUT}} nimble c --threads:on --out:dist/kcen-aoc-profile --profiler:on --stackTrace:on -d:nimDebugDlOpen -r --hints:off --debugger:native aoc.nim
+  AOC_DAY={{DAY}} AOC_INPUT={{INPUT}} nimble c --out:dist/kcen-aoc-profile --profiler:on --stackTrace:on -d:nimDebugDlOpen -r aoc.nim
 
 # Benchmark a specific day (uses optimized binary)
 bench DAY INPUT: build

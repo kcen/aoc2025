@@ -47,6 +47,13 @@ proc manhattanDistance*(a, b: Coord3): int {.inline, noSideEffect.} =
   ## Manhattan distance between two 3D coordinates
   abs(a.x - b.x) + abs(a.y - b.y) + abs(a.z - b.z)
 
+proc euclideanDistance*(a, b: Coord3): float {.inline, noSideEffect.} =
+  ## Euclidean distance between two 3D coordinates
+  let dx = a.x - b.x
+  let dy = a.y - b.y
+  let dz = a.z - b.z
+  sqrt(float(dx*dx + dy*dy + dz*dz))
+
 # ============================================================================
 # GRID TYPE AND BASIC OPERATIONS
 # ============================================================================

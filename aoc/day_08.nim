@@ -13,7 +13,7 @@ proc edges_by_length(junction_boxes: seq[Coord3]): seq[Edge] =
   let num_junctions = junction_boxes.len
   for i in 0..<num_junctions:
     for j in (i+1)..<num_junctions:
-      let dist = junction_boxes[i].distance_squared(junction_boxes[j])
+      let dist = distance_squared(junction_boxes[i], junction_boxes[j])
       result.add((u: i, v: j, distance: dist))
   result.sort((a,b) => cmp(a.distance, b.distance))
 
@@ -54,18 +54,19 @@ proc compute_circuit_products(junction_boxes: seq[Coord3], num_wires = 1000): (i
   var edge_count = 0
 
   for edge in edge_list:
+    edge_count.inc
+
     if find_root(parent, edge.u) != find_root(parent, edge.v):
       union(parent, rank, component_size, edge.u, edge.v)
-      edge_count.inc
 
-      if edge_count == num_wires:
-        var circuit_sizes = toSeq(0..<num_junctions).filterIt(parent[it] == it).mapIt(component_size[it])
-        circuit_sizes.sort(Descending)
-        part_one = circuit_sizes[0] * circuit_sizes[1] * circuit_sizes[2]
+    if edge_count == num_wires:
+      var circuit_sizes = toSeq(0..<num_junctions).filterIt(parent[it] == it).mapIt(component_size[it])
+      circuit_sizes.sort(Descending)
+      part_one = circuit_sizes[0] * circuit_sizes[1] * circuit_sizes[2]
 
-      if component_size[find_root(parent, edge.u)] == num_junctions:
-        part_two = junction_boxes[edge.u].x * junction_boxes[edge.v].x
-        break
+    if component_size[find_root(parent, edge.u)] == num_junctions:
+      part_two = junction_boxes[edge.u].x * junction_boxes[edge.v].x
+      break
   (part_one, part_two)
 
 proc day_08*(): Solution =
